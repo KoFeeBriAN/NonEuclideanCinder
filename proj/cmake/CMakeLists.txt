@@ -5,13 +5,20 @@ project( NonEuclideanCinder )
 
 get_filename_component( CINDER_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../Cinder" ABSOLUTE )
 get_filename_component( APP_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../" ABSOLUTE )
-get_filename_component( RESOURCE_PATH "${APP_PATH}/resources" ABSOLUTE )
 
 include( "${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake" )
 
+set ( SRC_FILES 
+	${APP_PATH}/src/CameraPerspApp.cpp
+)
+
+set ( RESOURCE_FILES
+	${APP_PATH}/resources/environment_maps/humus_sf.jpg
+)
+
 ci_make_app(
-	SOURCES		${APP_PATH}/src/CameraPerspApp.cpp
+	SOURCES		${SRC_FILES}
 	INCLUDES	${APP_PATH}/include
-	CINDER_PATH 	${CINDER_PATH}
-	RESOURCES	${RESOURCE_PATH}/environment_maps/humus_sf.jpg
+	CINDER_PATH	${CINDER_PATH}
+	RESOURCES	${RESOURCE_FILES}
 )
