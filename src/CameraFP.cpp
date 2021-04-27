@@ -15,7 +15,7 @@ protected:
     float mPitch = 0;
 
     float mYaw = -90;
-    float mMouseSensitivity = 0.75;
+    float mMouseSensitivity = 0.5;
     float mMoveSpeed = 20;
     vec3 mTarget;
 

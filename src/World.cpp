@@ -4,6 +4,7 @@
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/Fbo.h"
 #include "cinder/gl/gl.h"
+#include "glfw/glfw3.h"
 
 #include "CameraFP.cpp"
 #include "Resources.h"
@@ -84,15 +85,16 @@ void World::setup()
 {
     gl::enableDepthWrite();
     gl::enableDepthRead();
-    // hideCursor();
+
+    glfwSetInputMode((GLFWwindow*)getWindow()->getNative(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // setFullScreen(true);
+
     mCam.setEyePoint({ 0, 0, 5 });
     mCam.lookAt(vec3(0));
 
     auto img = loadImage(loadAsset("checkerboard.png"));
     mTexture = gl::Texture::create(img);
     mTexture->bind();
-
     auto shader = gl::ShaderDef().texture().lambert();
     mGlsl = gl::getStockShader(shader);
     auto sphere = geom::Sphere().subdivisions(50);
