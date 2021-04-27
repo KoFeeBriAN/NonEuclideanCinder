@@ -30,6 +30,8 @@ public:
     // Camera attributes
     ivec2 lastPos;
     ivec2 currentPos;
+
+    double mlastTime;
 };
 
 void World::prepareSettings(Settings* settings)
@@ -57,6 +59,16 @@ void World::keyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
+
+    double timeOffset = getElapsedSeconds() - mlastTime;
+    if (event.getCode() == KeyEvent::KEY_w)
+        mCam.move(MOVEMENT::FORWARD, timeOffset);
+    if (event.getCode() == KeyEvent::KEY_s)
+        mCam.move(MOVEMENT::BACKWARD, timeOffset);
+    if (event.getCode() == KeyEvent::KEY_a)
+        mCam.move(MOVEMENT::LEFT, timeOffset);
+    if (event.getCode() == KeyEvent::KEY_d)
+        mCam.move(MOVEMENT::RIGHT, timeOffset);
 }
 
 void World::update()
@@ -65,6 +77,7 @@ void World::update()
     // ImGui::Begin("CameraFP");
     // // ImGui::Text("Position: %f, %f, %f", pos.x, pos.y, pos.z);
     // ImGui::End();
+    mlastTime = getElapsedSeconds();
 }
 
 void World::setup()
@@ -88,7 +101,7 @@ void World::setup()
 
 void World::draw()
 {
-    gl::clear(Color(0.2f, 0.2f, 0.2f));
+    gl::clear(Color::gray(0.3f));
     gl::setMatrices(mCam);
 
     mSphere->draw();
