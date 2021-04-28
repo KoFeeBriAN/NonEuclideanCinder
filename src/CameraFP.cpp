@@ -3,12 +3,14 @@
 using namespace ci;
 using namespace std;
 
-enum class MOVEMENT { FORWARD,
+enum class MOVEMENT {
+    FORWARD,
     BACKWARD,
     RIGHT,
     LEFT,
-    UP,
-    DOWN };
+    UPWARD,
+    DOWNWARD,
+};
 
 class CameraFP : public CameraPersp {
 protected:
@@ -16,7 +18,7 @@ protected:
 
     float mYaw = -90;
     float mMouseSensitivity = 0.5;
-    float mMoveSpeed = 20;
+    float mMoveSpeed = 5;
     vec3 mTarget;
 
 public:
@@ -41,14 +43,28 @@ public:
     {
         float speed = mMoveSpeed * timeOffset;
 
-        if (movement == MOVEMENT::FORWARD)
+        switch (movement) {
+        case MOVEMENT::FORWARD:
             mEyePoint -= mW * speed;
-        if (movement == MOVEMENT::BACKWARD)
+            break;
+        case MOVEMENT::BACKWARD:
             mEyePoint += mW * speed;
-        if (movement == MOVEMENT::LEFT)
+            break;
+        case MOVEMENT::LEFT:
             mEyePoint -= mU * speed;
-        if (movement == MOVEMENT::RIGHT)
+            break;
+        case MOVEMENT::RIGHT:
             mEyePoint += mU * speed;
+            break;
+        case MOVEMENT::UPWARD:
+            mEyePoint += mV * speed;
+            break;
+        case MOVEMENT::DOWNWARD:
+            mEyePoint -= mV * speed;
+            break;
+        default:
+            break;
+        }
 
         lookAt(mEyePoint + mViewDirection);
     }

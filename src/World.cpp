@@ -22,6 +22,7 @@ public:
     void keyDown(KeyEvent event) override;
 
     static void prepareSettings(Settings* settings);
+    void processInput();
 
     CameraFP mCam;
     gl::BatchRef mSphere;
@@ -33,6 +34,8 @@ public:
     ivec2 currentPos;
 
     double mlastTime;
+    double mTimeOffset;
+    GLFWwindow* mGlfwWindowRef = (GLFWwindow*)getWindow()->getNative();
 };
 
 void World::prepareSettings(Settings* settings)
@@ -78,7 +81,14 @@ void World::update()
     // ImGui::Begin("CameraFP");
     // // ImGui::Text("Position: %f, %f, %f", pos.x, pos.y, pos.z);
     // ImGui::End();
-    mlastTime = getElapsedSeconds();
+
+    // Update time logic
+    double currentTime = getElapsedSeconds();
+    mTimeOffset = currentTime - mlastTime;
+    mlastTime = currentTime;
+
+    // Poll for inputs
+    processInput();
 }
 
 void World::setup()
@@ -86,7 +96,7 @@ void World::setup()
     gl::enableDepthWrite();
     gl::enableDepthRead();
 
-    glfwSetInputMode((GLFWwindow*)getWindow()->getNative(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // setFullScreen(true);
 
     mCam.setEyePoint({ 0, 0, 5 });
@@ -99,6 +109,22 @@ void World::setup()
     mGlsl = gl::getStockShader(shader);
     auto sphere = geom::Sphere().subdivisions(50);
     mSphere = gl::Batch::create(sphere, mGlsl);
+}
+
+void World::processInput()
+{
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_W) == GLFW_PRESS)
+        mCam.move(MOVEMENT::FORWARD, mTimeOffset);
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_S) == GLFW_PRESS)
+        mCam.move(MOVEMENT::BACKWARD, mTimeOffset);
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_A) == GLFW_PRESS)
+        mCam.move(MOVEMENT::LEFT, mTimeOffset);
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_D) == GLFW_PRESS)
+        mCam.move(MOVEMENT::RIGHT, mTimeOffset);
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_SPACE) == GLFW_PRESS)
+        mCam.move(MOVEMENT::UPWARD, mTimeOffset);
+    if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        mCam.move(MOVEMENT::DOWNWARD, mTimeOffset);
 }
 
 void World::draw()
