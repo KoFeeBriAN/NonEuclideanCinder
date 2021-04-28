@@ -6,7 +6,7 @@
 #include "cinder/gl/gl.h"
 #include "glfw/glfw3.h"
 
-#include "CameraFP.cpp"
+#include "CameraFP.h"
 #include "Resources.h"
 
 using namespace ci;
