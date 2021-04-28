@@ -18,7 +18,7 @@ protected:
 
     float mYaw = -90;
     float mMouseSensitivity = 0.5;
-    float mMoveSpeed = 5;
+    float mMoveSpeed = 7;
     vec3 mTarget;
 
 public:
@@ -57,10 +57,10 @@ public:
             mEyePoint += mU * speed;
             break;
         case MOVEMENT::UPWARD:
-            mEyePoint += mV * speed;
+            mEyePoint += mWorldUp * speed;
             break;
         case MOVEMENT::DOWNWARD:
-            mEyePoint -= mV * speed;
+            mEyePoint -= mWorldUp * speed;
             break;
         default:
             break;

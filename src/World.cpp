@@ -63,32 +63,6 @@ void World::keyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
-
-    double timeOffset = getElapsedSeconds() - mlastTime;
-    if (event.getCode() == KeyEvent::KEY_w)
-        mCam.move(MOVEMENT::FORWARD, timeOffset);
-    if (event.getCode() == KeyEvent::KEY_s)
-        mCam.move(MOVEMENT::BACKWARD, timeOffset);
-    if (event.getCode() == KeyEvent::KEY_a)
-        mCam.move(MOVEMENT::LEFT, timeOffset);
-    if (event.getCode() == KeyEvent::KEY_d)
-        mCam.move(MOVEMENT::RIGHT, timeOffset);
-}
-
-void World::update()
-{
-    // vec3 pos = mCam.getEyePoint();
-    // ImGui::Begin("CameraFP");
-    // // ImGui::Text("Position: %f, %f, %f", pos.x, pos.y, pos.z);
-    // ImGui::End();
-
-    // Update time logic
-    double currentTime = getElapsedSeconds();
-    mTimeOffset = currentTime - mlastTime;
-    mlastTime = currentTime;
-
-    // Poll for inputs
-    processInput();
 }
 
 void World::setup()
@@ -98,6 +72,8 @@ void World::setup()
 
     glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // setFullScreen(true);
+
+    ImGui::Initialize();
 
     mCam.setEyePoint({ 0, 0, 5 });
     mCam.lookAt(vec3(0));
@@ -109,6 +85,28 @@ void World::setup()
     mGlsl = gl::getStockShader(shader);
     auto sphere = geom::Sphere().subdivisions(50);
     mSphere = gl::Batch::create(sphere, mGlsl);
+}
+
+void World::update()
+{
+    const vec3& viewDir = mCam.getViewDirection();
+    const vec3& camPos = mCam.getEyePoint();
+
+    // Debug UI
+    ImGui::Begin("Debug panel");
+    ImGui::Text("Camera property");
+    ImGui::Text("View direction {%.2f, %.2f, %.2f}", viewDir.x, viewDir.y, viewDir.z);
+    ImGui::Text("Position {%.2f, %.2f, %.2f}", camPos.x, camPos.y, camPos.z);
+    ImGui::Text("ESC - Close applicaiton");
+    ImGui::End();
+
+    // Update time logic
+    double currentTime = getElapsedSeconds();
+    mTimeOffset = currentTime - mlastTime;
+    mlastTime = currentTime;
+
+    // Poll for inputs
+    processInput();
 }
 
 void World::processInput()
