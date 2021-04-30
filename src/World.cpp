@@ -63,6 +63,8 @@ void World::keyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
+    if (event.getCode() == KeyEvent::KEY_f)
+        mCam.toggleFreeze(mGlfwWindowRef);
 }
 
 void World::setup()
@@ -75,9 +77,11 @@ void World::setup()
 
     ImGui::Initialize();
 
+    // initialize camera properties
     mCam.setEyePoint({ 0, 0, 5 });
     mCam.lookAt(vec3(0));
 
+    // prepare batch program
     auto img = loadImage(loadAsset("checkerboard.png"));
     mTexture = gl::Texture::create(img);
     mTexture->bind();
@@ -97,7 +101,17 @@ void World::update()
     ImGui::Text("Camera property");
     ImGui::Text("View direction {%.2f, %.2f, %.2f}", viewDir.x, viewDir.y, viewDir.z);
     ImGui::Text("Position {%.2f, %.2f, %.2f}", camPos.x, camPos.y, camPos.z);
-    ImGui::Text("ESC - Close applicaiton");
+    ImGui::Text("Elapsed time:%.1f second", mlastTime);
+    ImGui::Separator();
+    ImGui::Text("Key binding");
+    ImGui::Text("W - Move forward");
+    ImGui::Text("A - Move left");
+    ImGui::Text("S - Move backward");
+    ImGui::Text("D - Move right");
+    ImGui::Text("Ctrl - Move downward");
+    ImGui::Text("Space - Move upward");
+    ImGui::Text("F - Freeze the camera");
+    ImGui::Text("Esc - Close applicaiton");
     ImGui::End();
 
     // Update time logic

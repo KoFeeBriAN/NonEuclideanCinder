@@ -5,6 +5,9 @@ using namespace std;
 
 void CameraFP::processMouse(float xoffset, float yoffset)
 {
+    if (mFrozen)
+        return;
+
     mYaw += xoffset * mMouseSensitivity;
     mPitch -= yoffset * mMouseSensitivity;
 
@@ -22,6 +25,9 @@ void CameraFP::processMouse(float xoffset, float yoffset)
 
 void CameraFP::move(MOVEMENT movement, double timeOffset)
 {
+    if (mFrozen)
+        return;
+
     float speed = mMoveSpeed * timeOffset;
 
     switch (movement) {
@@ -48,4 +54,23 @@ void CameraFP::move(MOVEMENT movement, double timeOffset)
     }
 
     lookAt(mEyePoint + mViewDirection);
+}
+
+void CameraFP::freeze(GLFWwindow* window)
+{
+    mFrozen = true;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+void CameraFP::unfreeze(GLFWwindow* window)
+{
+    mFrozen = false;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void CameraFP::toggleFreeze(GLFWwindow* window)
+{
+    if (mFrozen)
+        unfreeze(window);
+    else
+        freeze(window);
 }

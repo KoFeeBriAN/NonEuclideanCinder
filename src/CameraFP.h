@@ -1,4 +1,5 @@
 #include "cinder/Camera.h"
+#include "glfw/glfw3.h"
 
 using namespace ci;
 
@@ -18,8 +19,12 @@ protected:
     float mMouseSensitivity = 0.5;
     float mMoveSpeed = 7;
     vec3 mTarget;
+    bool mFrozen = false;
 
 public:
     void processMouse(float xoffset, float yoffset);
     void move(MOVEMENT movement, double timeOffset);
+    void freeze(GLFWwindow* window);
+    void unfreeze(GLFWwindow* window);
+    void toggleFreeze(GLFWwindow* window);
 };
