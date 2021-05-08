@@ -1,85 +1,15 @@
+#include "SceneTest.h"
 #include "cinder/CinderImGui.h"
 #include "cinder/app/App.h"
-#include "cinder/app/RendererGl.h"
-#include "cinder/gl/Batch.h"
-#include "cinder/gl/Fbo.h"
-#include "cinder/gl/gl.h"
-#include "glfw/glfw3.h"
-
-#include "CameraFP.h"
-#include "Resources.h"
 
 using namespace ci;
-using namespace ci::app;
 using namespace std;
 
-class World : public App {
-public:
-    void setup() override;
-    void update() override;
-    void draw() override;
-    void mouseMove(MouseEvent event) override;
-    void keyDown(KeyEvent event) override;
-
-    static void prepareSettings(Settings* settings);
-    void processInput();
-
-    CameraFP mCam;
-    gl::BatchRef mSphere;
-    gl::TextureRef mTexture;
-    gl::GlslProgRef mGlsl;
-
-    // Camera attributes
-    ivec2 lastPos;
-    ivec2 currentPos;
-
-    double mlastTime;
-    double mTimeOffset;
-    GLFWwindow* mGlfwWindowRef = (GLFWwindow*)getWindow()->getNative();
-};
-
-void World::prepareSettings(Settings* settings)
+void SceneTest::setup()
 {
-    settings->setResizable(true);
-}
 
-void World::mouseMove(MouseEvent event)
-{
-    static bool firstMouseMove = true;
-
-    if (firstMouseMove) {
-        lastPos = event.getPos();
-        firstMouseMove = false;
-    } else {
-        lastPos = currentPos;
-    }
-
-    currentPos = event.getPos();
-    ivec2 offset = currentPos - lastPos;
-    mCam.processMouse(offset.x, offset.y);
-}
-
-void World::keyDown(KeyEvent event)
-{
-    if (event.getCode() == KeyEvent::KEY_ESCAPE)
-        quit();
-    if (event.getCode() == KeyEvent::KEY_f)
-        mCam.toggleFreeze(mGlfwWindowRef);
-}
-
-void World::setup()
-{
     gl::enableDepthWrite();
     gl::enableDepthRead();
-
-    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // setFullScreen(true);
-
-    ImGui::Initialize();
-
-    // initialize camera properties
-    mCam.setEyePoint({ 0, 0, 5 });
-    mCam.lookAt(vec3(0));
 
     // prepare batch program
     auto img = loadImage(loadAsset("checkerboard.png"));
@@ -89,9 +19,17 @@ void World::setup()
     mGlsl = gl::getStockShader(shader);
     auto sphere = geom::Sphere().subdivisions(50);
     mSphere = gl::Batch::create(sphere, mGlsl);
+    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // setFullScreen(true);
+
+    ImGui::Initialize();
+
+    // initialize camera properties
+    mCam.setEyePoint({ 0, 0, 5 });
+    mCam.lookAt(vec3(0));
 }
 
-void World::update()
+void SceneTest::update()
 {
     const vec3& viewDir = mCam.getViewDirection();
     const vec3& camPos = mCam.getEyePoint();
@@ -123,7 +61,41 @@ void World::update()
     processInput();
 }
 
-void World::processInput()
+void SceneTest::draw()
+{
+    gl::clear(Color::gray(0.3f));
+    gl::setMatrices(mCam);
+    mSphere->draw();
+}
+
+Camera* SceneTest::getCamera()
+{
+    return &mCam;
+}
+
+void SceneTest::handleKeyDown(KeyEvent event)
+{
+    if (event.getCode() == KeyEvent::KEY_f)
+        mCam.toggleFreeze(mGlfwWindowRef);
+}
+
+void SceneTest::handleMouseMove(MouseEvent event)
+{
+    static bool firstMouseMove = true;
+
+    if (firstMouseMove) {
+        lastPos = event.getPos();
+        firstMouseMove = false;
+    } else {
+        lastPos = currentPos;
+    }
+
+    currentPos = event.getPos();
+    ivec2 offset = currentPos - lastPos;
+    mCam.processMouse(offset.x, offset.y);
+}
+
+void SceneTest::processInput()
 {
     if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_W) == GLFW_PRESS)
         mCam.move(MOVEMENT::FORWARD, mTimeOffset);
@@ -138,13 +110,3 @@ void World::processInput()
     if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         mCam.move(MOVEMENT::DOWNWARD, mTimeOffset);
 }
-
-void World::draw()
-{
-    gl::clear(Color::gray(0.3f));
-    gl::setMatrices(mCam);
-
-    mSphere->draw();
-}
-
-CINDER_APP(World, RendererGl(RendererGl::Options().msaa(16)), World::prepareSettings)

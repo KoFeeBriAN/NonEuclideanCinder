@@ -1,3 +1,4 @@
+#pragma once
 #include "cinder/Camera.h"
 #include "glfw/glfw3.h"
 

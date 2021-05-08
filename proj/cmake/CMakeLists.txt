@@ -9,8 +9,9 @@ get_filename_component( APP_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../" ABSOLUTE )
 include( "${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake" )
 
 set ( SRC_FILES 
-	${APP_PATH}/src/World.cpp
+	${APP_PATH}/src/MainApp.cpp
 	${APP_PATH}/src/CameraFP.cpp
+	${APP_PATH}/src/Scene/SceneTest.cpp
 )
 
 set ( RESOURCE_FILES
