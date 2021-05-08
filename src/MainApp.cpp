@@ -1,11 +1,11 @@
-#include "cinder/CinderImGui.h"
+#define GLFW_INCLUDE_NONE
+
+#include "Resources.h"
+#include "SceneTest.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "glfw/glfw3.h"
-
-#include "Resources.h"
-#include "SceneTest.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -21,6 +21,7 @@ public:
 
     static void prepareSettings(Settings* settings);
     Scene* currentScene = new SceneTest();
+    std::vector<DataSourceRef> mAssets;
 };
 
 void MainApp::prepareSettings(Settings* settings)
@@ -42,13 +43,14 @@ void MainApp::keyDown(KeyEvent event)
 
 void MainApp::setup()
 {
+    mAssets.push_back(loadAsset("checkerboard.png"));
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
-    currentScene->setup();
+    currentScene->setup(mAssets);
 }
 
 void MainApp::update()
 {
-    currentScene->update();
+    currentScene->update(getElapsedSeconds());
 }
 
 void MainApp::draw()

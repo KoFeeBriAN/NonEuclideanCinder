@@ -11,7 +11,8 @@ include( "${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake" )
 set ( SRC_FILES 
 	${APP_PATH}/src/MainApp.cpp
 	${APP_PATH}/src/CameraFP.cpp
-	${APP_PATH}/src/Scene/SceneTest.cpp
+	${APP_PATH}/src/Scene.cpp
+	${APP_PATH}/src/SceneTest.cpp
 )
 
 set ( RESOURCE_FILES

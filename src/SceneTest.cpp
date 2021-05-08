@@ -1,18 +1,18 @@
 #include "SceneTest.h"
+
 #include "cinder/CinderImGui.h"
-#include "cinder/app/App.h"
+#include "cinder/gl/Shader.h"
+#include "cinder/gl/wrapper.h"
 
 using namespace ci;
-using namespace std;
 
-void SceneTest::setup()
+void SceneTest::setup(std::vector<DataSourceRef>& assets)
 {
-
     gl::enableDepthWrite();
     gl::enableDepthRead();
 
     // prepare batch program
-    auto img = loadImage(loadAsset("checkerboard.png"));
+    auto img = loadImage(assets[0]);
     mTexture = gl::Texture::create(img);
     mTexture->bind();
     auto shader = gl::ShaderDef().texture().lambert();
@@ -29,7 +29,7 @@ void SceneTest::setup()
     mCam.lookAt(vec3(0));
 }
 
-void SceneTest::update()
+void SceneTest::update(double currentTime)
 {
     const vec3& viewDir = mCam.getViewDirection();
     const vec3& camPos = mCam.getEyePoint();
@@ -53,7 +53,6 @@ void SceneTest::update()
     ImGui::End();
 
     // Update time logic
-    double currentTime = getElapsedSeconds();
     mTimeOffset = currentTime - mlastTime;
     mlastTime = currentTime;
 

@@ -1,4 +1,7 @@
 #pragma once
+
+#define GLFW_INCLUDE_NONE
+
 #include "cinder/Camera.h"
 #include "glfw/glfw3.h"
 
