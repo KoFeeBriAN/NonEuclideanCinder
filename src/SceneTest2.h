@@ -8,7 +8,7 @@
 
 using namespace ci;
 
-class SceneTest : public Scene {
+class SceneTest2 : public Scene {
 private:
     CameraFP mCam;
     gl::BatchRef mSphere;
@@ -24,7 +24,7 @@ private:
     bool firstMouseMove = true;
 
 public:
-    ~SceneTest() = default;
+    ~SceneTest2() = default;
     void setup(const std::unordered_map<std::string, DataSourceRef>& assets) override;
     void update(double currentTime) override;
     void draw() override;

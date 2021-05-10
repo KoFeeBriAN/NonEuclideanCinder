@@ -20,7 +20,7 @@ class CameraFP : public CameraPersp {
 protected:
     float mPitch = 0;
     float mYaw = -90;
-    float mMouseSensitivity = 0.5;
+    float mMouseSensitivity = 0.35;
     float mMoveSpeed = 7;
     vec3 mTarget;
     bool mFrozen = false;

@@ -13,6 +13,7 @@ set ( SRC_FILES
 	${APP_PATH}/src/CameraFP.cpp
 	${APP_PATH}/src/Scene.cpp
 	${APP_PATH}/src/SceneTest.cpp
+	${APP_PATH}/src/SceneTest2.cpp
 )
 
 set ( RESOURCE_FILES

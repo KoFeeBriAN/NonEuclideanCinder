@@ -14,6 +14,7 @@ using namespace ci;
 
 class Scene {
 public:
+    virtual ~Scene() = 0;
     virtual void setup(const std::unordered_map<std::string, DataSourceRef>& assets) = 0;
     virtual void update(double currentTime) = 0;
     virtual void draw() = 0;

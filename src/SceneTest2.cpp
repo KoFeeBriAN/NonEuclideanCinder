@@ -1,4 +1,4 @@
-#include "SceneTest.h"
+#include "SceneTest2.h"
 
 #include "cinder/CinderImGui.h"
 #include "cinder/gl/Shader.h"
@@ -6,7 +6,7 @@
 
 using namespace ci;
 
-void SceneTest::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
+void SceneTest2::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
     gl::enableDepthWrite();
     gl::enableDepthRead();
@@ -29,7 +29,7 @@ void SceneTest::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mCam.lookAt(vec3(0));
 }
 
-void SceneTest::update(double currentTime)
+void SceneTest2::update(double currentTime)
 {
     const vec3& viewDir = mCam.getViewDirection();
     const vec3& camPos = mCam.getEyePoint();
@@ -60,25 +60,25 @@ void SceneTest::update(double currentTime)
     processInput();
 }
 
-void SceneTest::draw()
+void SceneTest2::draw()
 {
-    gl::clear(Color::gray(0.2f));
+    gl::clear(Color::white());
     gl::setMatrices(mCam);
     mSphere->draw();
 }
 
-Camera* SceneTest::getCamera()
+Camera* SceneTest2::getCamera()
 {
     return &mCam;
 }
 
-void SceneTest::handleKeyDown(KeyEvent event)
+void SceneTest2::handleKeyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_f)
         mCam.toggleFreeze(mGlfwWindowRef);
 }
 
-void SceneTest::handleMouseMove(MouseEvent event)
+void SceneTest2::handleMouseMove(MouseEvent event)
 {
     if (firstMouseMove) {
         lastPos = event.getPos();
@@ -92,7 +92,7 @@ void SceneTest::handleMouseMove(MouseEvent event)
     mCam.processMouse(offset.x, offset.y);
 }
 
-void SceneTest::processInput()
+void SceneTest2::processInput()
 {
     if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_W) == GLFW_PRESS)
         mCam.move(MOVEMENT::FORWARD, mTimeOffset);
