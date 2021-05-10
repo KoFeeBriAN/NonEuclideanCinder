@@ -23,7 +23,7 @@ private:
     double mTimeOffset;
 
 public:
-    void setup(std::vector<DataSourceRef>& assets) override;
+    void setup(const std::unordered_map<std::string, DataSourceRef>& assets) override;
     void update(double currentTime) override;
     void draw() override;
     Camera* getCamera() override;

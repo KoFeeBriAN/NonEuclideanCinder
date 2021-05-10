@@ -6,12 +6,16 @@
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "glfw/glfw3.h"
+#include <unordered_map>
 
 using namespace ci;
 using namespace ci::app;
-using namespace std;
 
 class MainApp : public App {
+private:
+    Scene* currentScene = new SceneTest();
+    std::unordered_map<std::string, DataSourceRef> mSources;
+
 public:
     void setup() override;
     void update() override;
@@ -20,8 +24,6 @@ public:
     void keyDown(KeyEvent event) override;
 
     static void prepareSettings(Settings* settings);
-    Scene* currentScene = new SceneTest();
-    std::vector<DataSourceRef> mAssets;
 };
 
 void MainApp::prepareSettings(Settings* settings)
@@ -43,9 +45,9 @@ void MainApp::keyDown(KeyEvent event)
 
 void MainApp::setup()
 {
-    mAssets.push_back(loadAsset("checkerboard.png"));
+    mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
-    currentScene->setup(mAssets);
+    currentScene->setup(mSources);
 }
 
 void MainApp::update()

@@ -6,13 +6,13 @@
 
 using namespace ci;
 
-void SceneTest::setup(std::vector<DataSourceRef>& assets)
+void SceneTest::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
     gl::enableDepthWrite();
     gl::enableDepthRead();
 
     // prepare batch program
-    auto img = loadImage(assets[0]);
+    auto img = loadImage(assets.at("checkerboard.png"));
     mTexture = gl::Texture::create(img);
     mTexture->bind();
     auto shader = gl::ShaderDef().texture().lambert();
@@ -62,7 +62,7 @@ void SceneTest::update(double currentTime)
 
 void SceneTest::draw()
 {
-    gl::clear(Color::gray(0.3f));
+    gl::clear(Color::gray(0.2f));
     gl::setMatrices(mCam);
     mSphere->draw();
 }
