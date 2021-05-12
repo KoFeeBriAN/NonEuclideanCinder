@@ -49,6 +49,7 @@ void SceneTest::update(double currentTime)
     ImGui::Text("Ctrl - Move downward");
     ImGui::Text("Space - Move upward");
     ImGui::Text("F - Freeze the camera");
+    ImGui::Text("G - Togle fullscreen mode");
     ImGui::Text("Esc - Close applicaiton");
     ImGui::End();
 

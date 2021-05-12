@@ -21,6 +21,8 @@ class MainApp : public App {
 private:
     Scene* currentScene = new SceneTest();
     std::unordered_map<std::string, DataSourceRef> mSources;
+    int mWindowWidth = 1000;
+    int mWindowHeight = 800;
 
 public:
     void setup() override;
@@ -28,10 +30,12 @@ public:
     void draw() override;
     void mouseMove(MouseEvent event) override;
     void keyDown(KeyEvent event) override;
+    void resize() override;
     static void prepareSettings(Settings* settings);
 
 private:
     void switchScene(SCENE scene);
+    void toggleFullscreen();
 };
 
 void MainApp::prepareSettings(Settings* settings)
@@ -48,6 +52,8 @@ void MainApp::keyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
+    if (event.getCode() == KeyEvent::KEY_g)
+        toggleFullscreen();
 
     if (event.getCode() == KeyEvent::KEY_1)
         switchScene(SCENE::TEST);
@@ -57,9 +63,27 @@ void MainApp::keyDown(KeyEvent event)
     currentScene->handleKeyDown(event);
 }
 
+void MainApp::resize()
+{
+    mWindowWidth = getWindowWidth();
+    mWindowHeight = getWindowHeight();
+    currentScene->getCamera()->setAspectRatio(getWindowAspectRatio());
+}
+
+void MainApp::toggleFullscreen()
+{
+    if (isFullScreen()) {
+        setWindowSize(mWindowWidth, mWindowHeight);
+        setFullScreen(false);
+    } else {
+        setFullScreen(true);
+    }
+}
+
 void MainApp::setup()
 {
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
+    setWindowSize(mWindowWidth, mWindowHeight);
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);
 }
