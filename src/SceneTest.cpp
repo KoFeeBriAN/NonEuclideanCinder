@@ -80,6 +80,16 @@ void SceneTest::handleKeyDown(KeyEvent event)
         mCam.toggleFreeze(mGlfwWindowRef);
     if (event.getCode() == KeyEvent::KEY_t)
         mCam.toggleFloating();
+
+    // For testing
+    if (event.getCode() == KeyEvent::KEY_i)
+        mCam.move(MOVEMENT::FORWARD, mTimeOffset);
+    if (event.getCode() == KeyEvent::KEY_k)
+        mCam.move(MOVEMENT::BACKWARD, mTimeOffset);
+    if (event.getCode() == KeyEvent::KEY_j)
+        mCam.move(MOVEMENT::LEFT, mTimeOffset);
+    if (event.getCode() == KeyEvent::KEY_l)
+        mCam.move(MOVEMENT::RIGHT, mTimeOffset);
 }
 
 void SceneTest::handleMouseMove(MouseEvent event)
