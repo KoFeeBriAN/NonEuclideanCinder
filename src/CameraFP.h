@@ -18,12 +18,13 @@ enum class MOVEMENT {
 
 class CameraFP : public CameraPersp {
 protected:
+    vec3 mTarget;
     float mPitch = 0;
     float mYaw = -90;
-    float mMouseSensitivity = 0.35;
+    float mMouseSensitivity = 0.2;
     float mMoveSpeed = 7;
-    vec3 mTarget;
     bool mFrozen = false;
+    bool mFloating = true;
 
 public:
     void processMouse(float xoffset, float yoffset);
@@ -31,4 +32,5 @@ public:
     void freeze(GLFWwindow* window);
     void unfreeze(GLFWwindow* window);
     void toggleFreeze(GLFWwindow* window);
+    void toggleFloating();
 };

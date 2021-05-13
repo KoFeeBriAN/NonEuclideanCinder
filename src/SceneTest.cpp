@@ -49,6 +49,7 @@ void SceneTest::update(double currentTime)
     ImGui::Text("Ctrl - Move downward");
     ImGui::Text("Space - Move upward");
     ImGui::Text("F - Freeze the camera");
+    ImGui::Text("T - Toggle floating camera");
     ImGui::Text("G - Togle fullscreen mode");
     ImGui::Text("Esc - Close applicaiton");
     ImGui::End();
@@ -77,6 +78,8 @@ void SceneTest::handleKeyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_f)
         mCam.toggleFreeze(mGlfwWindowRef);
+    if (event.getCode() == KeyEvent::KEY_t)
+        mCam.toggleFloating();
 }
 
 void SceneTest::handleMouseMove(MouseEvent event)

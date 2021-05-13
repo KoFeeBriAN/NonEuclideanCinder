@@ -28,6 +28,8 @@ void CameraFP::move(MOVEMENT movement, double timeOffset)
     if (mFrozen)
         return;
 
+    float currentY = mEyePoint.y;
+
     float speed = mMoveSpeed * timeOffset;
 
     switch (movement) {
@@ -53,6 +55,9 @@ void CameraFP::move(MOVEMENT movement, double timeOffset)
         break;
     }
 
+    if (!mFloating)
+        mEyePoint.y = currentY;
+
     lookAt(mEyePoint + mViewDirection);
 }
 
@@ -73,4 +78,9 @@ void CameraFP::toggleFreeze(GLFWwindow* window)
         unfreeze(window);
     else
         freeze(window);
+}
+
+void CameraFP::toggleFloating()
+{
+    mFloating = !mFloating;
 }
