@@ -21,12 +21,13 @@ protected:
     vec3 mTarget;
     float mPitch = 0;
     float mYaw = -90;
-    float mMouseSensitivity = 0.2;
     float mMoveSpeed = 7;
     bool mFrozen = false;
     bool mFloating = true;
 
 public:
+    float mMouseSensitivity = 0.2;
+
     void processMouse(float xoffset, float yoffset);
     void move(MOVEMENT movement, double timeOffset);
     void freeze(GLFWwindow* window);
