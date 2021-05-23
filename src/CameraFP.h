@@ -23,6 +23,7 @@ protected:
     float mYaw = -90;
     float mMoveSpeed = 7;
     bool mFrozen = false;
+    bool mHidden = false;
     bool mFloating = true;
 
 public:
@@ -32,6 +33,9 @@ public:
     void move(MOVEMENT movement, double timeOffset);
     void freeze(GLFWwindow* window);
     void unfreeze(GLFWwindow* window);
+    void showCursor(GLFWwindow* window);
+    void hideCursor(GLFWwindow* window);
+    void toggleHiddenCursor(GLFWwindow* window);
     void toggleFreeze(GLFWwindow* window);
     void toggleFloating();
 };
