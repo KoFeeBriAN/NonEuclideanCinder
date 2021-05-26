@@ -41,7 +41,7 @@ void SceneTest::update(double currentTime)
     ImGui::Text("Position {%.2f, %.2f, %.2f}", camPos.x, camPos.y, camPos.z);
     ImGui::Text("Elapsed time:%.1f second", mlastTime);
     ImGui::Separator();
-    ImGui::SliderFloat("Camera sensitivity", &mCam.mMouseSensitivity, 0.01, 0.3);
+    ImGui::SliderFloat("Camera sensitivity", &mCam.mMouseSensitivity, 0.001, 0.3);
     ImGui::Separator();
     ImGui::Text("Key binding");
     ImGui::Text("W - Move forward");
@@ -51,6 +51,7 @@ void SceneTest::update(double currentTime)
     ImGui::Text("Ctrl - Move downward");
     ImGui::Text("Space - Move upward");
     ImGui::Text("F - Freeze the camera");
+    ImGui::Text("H - Toggle hidden cursor (for WSL)");
     ImGui::Text("T - Toggle floating camera");
     ImGui::Text("G - Togle fullscreen mode");
     ImGui::Text("Esc - Close applicaiton");
@@ -82,6 +83,8 @@ void SceneTest::handleKeyDown(KeyEvent event)
         mCam.toggleFreeze(mGlfwWindowRef);
     if (event.getCode() == KeyEvent::KEY_t)
         mCam.toggleFloating();
+    if (event.getCode() == KeyEvent::KEY_h)
+        mCam.toggleHiddenCursor(mGlfwWindowRef);
 
     // For testing
     if (event.getCode() == KeyEvent::KEY_i)

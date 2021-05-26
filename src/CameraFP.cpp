@@ -1,4 +1,6 @@
 #include "CameraFP.h"
+#include "cinder/Log.h"
+#include <string>
 
 using namespace ci;
 using namespace std;
@@ -18,6 +20,9 @@ void CameraFP::processMouse(float xoffset, float yoffset)
     newDir.y = sin(toRadians(mPitch));
     newDir.z = sin(toRadians(mYaw)) * cos(toRadians(mPitch));
     newDir = glm::normalize(newDir);
+
+    string output = "New dir" + to_string(newDir.x) + to_string(newDir.y) + to_string(newDir.z);
+    CI_LOG_D(output);
 
     mTarget = mEyePoint + newDir;
     lookAt(mTarget);
@@ -70,6 +75,28 @@ void CameraFP::unfreeze(GLFWwindow* window)
 {
     mFrozen = false;
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void CameraFP::showCursor(GLFWwindow* window)
+{
+    mHidden = false;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+void CameraFP::hideCursor(GLFWwindow* window)
+{
+    mHidden = true;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void CameraFP::toggleHiddenCursor(GLFWwindow* window)
+{
+    if (!mFrozen)
+    {
+        if (mHidden)
+            showCursor(window);
+        else
+            hideCursor(window);
+    }
 }
 
 void CameraFP::toggleFreeze(GLFWwindow* window)
