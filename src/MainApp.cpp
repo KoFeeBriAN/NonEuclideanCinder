@@ -3,6 +3,7 @@
 #include "Resources.h"
 #include "SceneTest.h"
 #include "SceneTest2.h"
+#include "SceneRoom.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -14,7 +15,8 @@ using namespace ci::app;
 
 enum class SCENE {
     TEST,
-    TEST2
+    TEST2,
+    ROOM,
 };
 
 class MainApp : public App {
@@ -40,6 +42,7 @@ private:
 
 void MainApp::prepareSettings(Settings* settings)
 {
+    // Set App Resizable prop to TRUE
     settings->setResizable(true);
 }
 
@@ -50,15 +53,20 @@ void MainApp::mouseMove(MouseEvent event)
 
 void MainApp::keyDown(KeyEvent event)
 {
+    // Exit the app
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
+    // toggle full screen
     if (event.getCode() == KeyEvent::KEY_g)
         toggleFullscreen();
 
+    // Handle Switch Scenes
     if (event.getCode() == KeyEvent::KEY_1)
         switchScene(SCENE::TEST);
     if (event.getCode() == KeyEvent::KEY_2)
         switchScene(SCENE::TEST2);
+    if (event.getCode() == KeyEvent::KEY_3)
+        switchScene(SCENE::ROOM);   // Mutiple Rooms
 
     currentScene->handleKeyDown(event);
 }
@@ -82,8 +90,13 @@ void MainApp::toggleFullscreen()
 
 void MainApp::setup()
 {
+    // Load Resources
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
+
+    // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);
+
+    // Setup Scene
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);
 }
@@ -104,14 +117,22 @@ void MainApp::switchScene(SCENE scene)
         delete currentScene;
 
     switch (scene) {
+    case SCENE::TEST:
+        currentScene = new SceneTest();
+        break;
     case SCENE::TEST2:
         currentScene = new SceneTest2();
         break;
+    case SCENE::ROOM:
+        currentScene = new SceneRoom();
+        break;
 
     default:
-        currentScene = new SceneTest();
+        // for testing ROOM SCENE
+        currentScene = new SceneRoom();
         break;
     }
+
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);
 }

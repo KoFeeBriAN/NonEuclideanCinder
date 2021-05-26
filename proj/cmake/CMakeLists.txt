@@ -14,6 +14,7 @@ set ( SRC_FILES
 	${APP_PATH}/src/Scene.cpp
 	${APP_PATH}/src/SceneTest.cpp
 	${APP_PATH}/src/SceneTest2.cpp
+	${APP_PATH}/src/SceneRoom.cpp
 )
 
 set ( RESOURCE_FILES
