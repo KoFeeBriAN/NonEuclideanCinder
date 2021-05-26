@@ -6,7 +6,7 @@
 		{
 			"label": "Build and Run",
 			"type": "shell",
-			"command": "make clean && cmake ../proj/cmake && make && ./Debug/NonEuclideanCinder/NonEuclideanCinder",
+			"command": "make clean && cmake ../proj/cmake && make -j 4 && ./Debug/NonEuclideanCinder/NonEuclideanCinder",
 			"options": {
 				"cwd": "${workspaceFolder}/build/"
 			},
