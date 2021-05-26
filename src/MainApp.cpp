@@ -3,6 +3,7 @@
 #include "Resources.h"
 #include "SceneTest.h"
 #include "SceneTest2.h"
+#include "SceneTunnel.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -14,7 +15,8 @@ using namespace ci::app;
 
 enum class SCENE {
     TEST,
-    TEST2
+    TEST2,
+    TUNNEL
 };
 
 class MainApp : public App {
@@ -59,6 +61,8 @@ void MainApp::keyDown(KeyEvent event)
         switchScene(SCENE::TEST);
     if (event.getCode() == KeyEvent::KEY_2)
         switchScene(SCENE::TEST2);
+    if (event.getCode() == KeyEvent::KEY_3)
+        switchScene(SCENE::TUNNEL);
 
     currentScene->handleKeyDown(event);
 }
@@ -106,6 +110,10 @@ void MainApp::switchScene(SCENE scene)
     switch (scene) {
     case SCENE::TEST2:
         currentScene = new SceneTest2();
+        break;
+
+    case SCENE::TUNNEL:
+        currentScene = new SceneTunnel();
         break;
 
     default:
