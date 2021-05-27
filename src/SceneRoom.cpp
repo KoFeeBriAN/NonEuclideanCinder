@@ -19,28 +19,37 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // initialize camera properties
-    mCam.setEyePoint({ 0, 0, 5 });                  // set camera position
-    mCam.lookAt(vec3(0., -5., -5.));                // set view direction
+    mCam.setEyePoint({ 0, 10, 0 });                  // set camera position
+    mCam.lookAt(vec3(1., 0., 0.));                // set view direction
+
+    // Setup Parameter
+    mRoomSize = glm::vec3(100., 20., 100.);
 
     // Setup Plane
-    auto img_checkerboard = loadImage(assets.at("checkerboard.png"));
     auto fmt = gl::Texture::Format(); 
     fmt.setWrap( GL_REPEAT, GL_REPEAT );
-    fmt.enableMipmapping( true );
-    fmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
-    mPlaneTexture = gl::Texture::create(img_checkerboard, fmt);
-    mPlaneTexture->bind();
+    // fmt.enableMipmapping( true );
+    // fmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
+    mFloorTexture = gl::Texture::create( loadImage( assets.at("checkerboard.png") ), fmt );
 
-    auto shader = gl::ShaderDef().texture( mPlaneTexture ).lambert();
-    mPlaneShader = gl::getStockShader(shader);
+    mFloorShader = gl::getStockShader( gl::ShaderDef().texture( mFloorTexture ).lambert() );
 
-    auto plane = geom::Plane()
-        .size(glm::vec2(1200., 1200.))
-        .origin(glm::vec3(0., -5., -5.));
+    auto plane = geom::Plane().size({ mRoomSize.x, mRoomSize.z });
 
-    mPlane = gl::Batch::create(plane, mPlaneShader);
+    mFloor = gl::Batch::create(plane, mFloorShader);
 
     // Setup Wall
+    mWallTexture = gl::Texture::create( loadImage( assets.at("rock-toon.jpg") ) );
+
+    mWallShader = gl::getStockShader( gl::ShaderDef().texture( mWallTexture ).lambert() );
+
+    mWalls.push_back( gl::Batch::create( geom::Cube().size({ 1., mRoomSize.y, mRoomSize.z }) >> geom::Transform(geom::Translate(vec3(mRoomSize.x / 2, mRoomSize.y / 2, 0.))), mWallShader));
+    mWalls.push_back( gl::Batch::create( geom::Cube().size({ 1., mRoomSize.y, mRoomSize.z }) >> geom::Transform(geom::Translate(vec3(-mRoomSize.x / 2, mRoomSize.y / 2, 0.))), mWallShader));
+    mWalls.push_back( gl::Batch::create( geom::Cube().size({ mRoomSize.x, mRoomSize.y, 1. }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, mRoomSize.z / 2))), mWallShader));
+    mWalls.push_back( gl::Batch::create( geom::Cube().size({ mRoomSize.x, mRoomSize.y, 1. }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, -mRoomSize.z / 2))), mWallShader));
+    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
+    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
+    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
 }
 
 void SceneRoom::update(double currentTime)
@@ -77,8 +86,15 @@ void SceneRoom::draw()
     // Enable depth buffer
     gl::ScopedDepth depth( true );
 
+    // Draw Walls
+    mWallTexture->bind();
+    for (auto batch: mWalls) {
+        batch->draw();
+    }
+
     // Draw Plane Floor
-    mPlane->draw();
+    mFloorTexture->bind();
+    mFloor->draw();
 }
 
 Camera* SceneRoom::getCamera()

@@ -5,17 +5,19 @@
 #include "CameraFP.h"
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/Texture.h"
+#include <vector>
 
 using namespace ci;
 
 class SceneRoom : public Scene {
 private:
     CameraFP mCam;
-    gl::BatchRef mPlane;
-    gl::TextureRef mPlaneTexture;
-    gl::GlslProgRef mPlaneShader;
+    glm::vec3 mRoomSize;
+    gl::BatchRef mFloor;
+    gl::TextureRef mFloorTexture;
+    gl::GlslProgRef mFloorShader;
 
-    gl::BatchRef mWall[4];
+    std::vector<gl::BatchRef> mWalls;
     gl::TextureRef mWallTexture;
     gl::GlslProgRef mWallShader;
     // Camera attributes

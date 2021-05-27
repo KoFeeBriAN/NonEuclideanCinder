@@ -92,6 +92,7 @@ void MainApp::setup()
 {
     // Load Resources
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
+    mSources.insert({ "rock-toon.jpg", loadAsset("rock-toon.jpg") });
 
     // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);
