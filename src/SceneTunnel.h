@@ -12,11 +12,11 @@ using namespace ci;
 class SceneTunnel : public Scene {
 private:
     CameraFP mCam;
-    gl::TextureRef mTexture;
-    gl::GlslProgRef mGlsl;
-    std::vector<gl::BatchRef> mBatches;
-    geom::Cube mCube;
-    float cubex = 1;
+    gl::TextureRef mFloorTex;
+    gl::TextureRef mTunnelTex;
+    gl::GlslProgRef mTexGlsl;
+    gl::BatchRef mFloorBatch;
+    std::vector<gl::BatchRef> mTunnelBatches;
 
     // Camera attributes
     ivec2 lastPos;

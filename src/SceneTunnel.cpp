@@ -14,26 +14,23 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     // set GLFW
     glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // prepare texture and glsl program
-    auto img = loadImage(assets.at("checkerboard.png"));
-    mTexture = gl::Texture::create(img);
-    mTexture->bind();
-    mTexture->setWrap(GL_REPEAT, GL_REPEAT);
-    auto shader = gl::ShaderDef().texture();
-    mGlsl = gl::getStockShader(shader);
+    // setup texture
+    mFloorTex = gl::Texture::create(loadImage(assets.at("checkerboard.png")));
+    mTunnelTex = gl::Texture::create(loadImage(assets.at("rock-tunnel")));
 
-    // Main sphere
-    // auto sphere = gl::Batch::create(geom::Sphere().subdivisions(50), mGlsl);
-    // mBatches.push_back(sphere);
-    // Ground plane
-    auto floor = gl::Batch::create(geom::Plane().size({ 69, 69 }), mGlsl);
-    mBatches.push_back(floor);
+    // setup glsl program
+    mTexGlsl = gl::getStockShader(gl::ShaderDef().texture());
 
-    // Tunnel
-    auto m1 = geom::Cube().size({ 1, 13, 10 }) >> geom::Transform(translate(vec3(-10, 0, 0)));
-    mBatches.push_back(gl::Batch::create(m1, mGlsl));
-    m1 = m1 >> geom::Transform(translate(vec3(0, 20, 0))) >> geom::Transform(rotate(180.0f, vec3(0, 0, 1)));
-    mBatches.push_back(gl::Batch::create(m1, mGlsl));
+    // setup floor
+    mFloorBatch = gl::Batch::create(geom::Plane().size({ 69, 69 }), mTexGlsl);
+
+    // setup Tunnel1
+    auto m1 = geom::Cube().size({ 1, 6, 10 }) >> geom::Translate(vec3(-10, 3, -5));
+    auto m2 = geom::Cube().size({ 6.5, 1, 10 }) >> geom::Translate(vec3(-7.25, 6.5, -5));
+    auto m3 = m1 >> geom::Translate(vec3(5.5, 0, 0));
+    mTunnelBatches.push_back(gl::Batch::create(m1, mTexGlsl));
+    mTunnelBatches.push_back(gl::Batch::create(m2, mTexGlsl));
+    mTunnelBatches.push_back(gl::Batch::create(m3, mTexGlsl));
 
     // setFullScreen(true);
 
@@ -57,8 +54,6 @@ void SceneTunnel::update(double currentTime)
     ImGui::Text("Position {%.2f, %.2f, %.2f}", camPos.x, camPos.y, camPos.z);
     ImGui::Text("Elapsed time:%.1f second", mlastTime);
     ImGui::Separator();
-    ImGui::SliderFloat("Cube X", &cubex, 1, 10);
-    ImGui::Separator();
     ImGui::SliderFloat("Camera sensitivity", &mCam.mMouseSensitivity, 0.01, 0.3);
     ImGui::Separator();
     ImGui::Text("Key binding");
@@ -78,10 +73,6 @@ void SceneTunnel::update(double currentTime)
     mTimeOffset = currentTime - mlastTime;
     mlastTime = currentTime;
 
-    // Update cube
-    mCube.size({ cubex, 13, 10 });
-    // mBatches[1] = gl::Batch::create(mCube, mGlsl);
-
     // Poll for inputs
     processInput();
 }
@@ -91,8 +82,12 @@ void SceneTunnel::draw()
     gl::clear(Color::gray(0.2f));
     gl::setMatrices(mCam);
 
-    for (auto model : mBatches)
-        model->draw();
+    mTunnelTex->bind();
+    for (auto batch : mTunnelBatches)
+        batch->draw();
+
+    mFloorTex->bind();
+    mFloorBatch->draw();
 }
 
 Camera* SceneTunnel::getCamera()
