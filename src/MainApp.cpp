@@ -4,6 +4,7 @@
 #include "SceneTest.h"
 #include "SceneTest2.h"
 #include "SceneRoom.h"
+#include "SceneTunnel.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -17,6 +18,7 @@ enum class SCENE {
     TEST,
     TEST2,
     ROOM,
+    TUNNEL
 };
 
 class MainApp : public App {
@@ -67,6 +69,8 @@ void MainApp::keyDown(KeyEvent event)
         switchScene(SCENE::TEST2);
     if (event.getCode() == KeyEvent::KEY_3)
         switchScene(SCENE::ROOM);   // Mutiple Rooms
+    if (event.getCode() == KeyEvent::KEY_4)
+        switchScene(SCENE::TUNNEL);
 
     currentScene->handleKeyDown(event);
 }
@@ -93,6 +97,7 @@ void MainApp::setup()
     // Load Resources
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
     mSources.insert({ "rock-toon.jpg", loadAsset("rock-toon.jpg") });
+    mSources.insert({ "rock-tunnel", loadAsset("cartoon-rock-texture.jpg") });
 
     // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);
@@ -126,6 +131,10 @@ void MainApp::switchScene(SCENE scene)
         break;
     case SCENE::ROOM:
         currentScene = new SceneRoom();
+        break;
+
+    case SCENE::TUNNEL:
+        currentScene = new SceneTunnel();
         break;
 
     default:
