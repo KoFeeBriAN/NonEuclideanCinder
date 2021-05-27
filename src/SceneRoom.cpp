@@ -4,6 +4,7 @@
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/wrapper.h"
 #include "cinder/gl/gl.h"
+#include "cinder/Log.h"
 
 using namespace ci;
 
@@ -11,25 +12,35 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
 {
     gl::enableDepthWrite();
     gl::enableDepthRead();
-
-    // prepare batch program
-    auto img = loadImage(assets.at("checkerboard.png"));
-    auto shader = gl::ShaderDef().texture().lambert();
-    auto sphere = geom::Sphere().subdivisions(50);
-
-    mTexture = gl::Texture::create(img);
-    mTexture->bind();
-    mGlsl = gl::getStockShader(shader);
-    mSphere = gl::Batch::create(sphere, mGlsl);
     
-    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // setFullScreen(true);
+    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+    // Initialize ImGui
     ImGui::Initialize();
 
     // initialize camera properties
-    mCam.setEyePoint({ 0, 0, 5 });
-    mCam.lookAt(vec3(0));
+    mCam.setEyePoint({ 0, 0, 5 });                  // set camera position
+    mCam.lookAt(vec3(0., -5., -5.));                // set view direction
+
+    // Setup Plane
+    auto img_checkerboard = loadImage(assets.at("checkerboard.png"));
+    auto fmt = gl::Texture::Format(); 
+    fmt.setWrap( GL_REPEAT, GL_REPEAT );
+    fmt.enableMipmapping( true );
+    fmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
+    mPlaneTexture = gl::Texture::create(img_checkerboard, fmt);
+    mPlaneTexture->bind();
+
+    auto shader = gl::ShaderDef().texture( mPlaneTexture ).lambert();
+    mPlaneShader = gl::getStockShader(shader);
+
+    auto plane = geom::Plane()
+        .size(glm::vec2(1200., 1200.))
+        .origin(glm::vec3(0., -5., -5.));
+
+    mPlane = gl::Batch::create(plane, mPlaneShader);
+
+    // Setup Wall
 }
 
 void SceneRoom::update(double currentTime)
@@ -43,21 +54,7 @@ void SceneRoom::update(double currentTime)
     ImGui::Text("View direction {%.2f, %.2f, %.2f}", viewDir.x, viewDir.y, viewDir.z);
     ImGui::Text("Position {%.2f, %.2f, %.2f}", camPos.x, camPos.y, camPos.z);
     ImGui::Text("Elapsed time:%.1f second", mlastTime);
-    ImGui::Separator();
     ImGui::SliderFloat("Camera sensitivity", &mCam.mMouseSensitivity, 0.001, 0.3);
-    ImGui::Separator();
-    ImGui::Text("Key binding");
-    ImGui::Text("W - Move forward");
-    ImGui::Text("A - Move left");
-    ImGui::Text("S - Move backward");
-    ImGui::Text("D - Move right");
-    ImGui::Text("Ctrl - Move downward");
-    ImGui::Text("Space - Move upward");
-    ImGui::Text("F - Freeze the camera");
-    ImGui::Text("H - Toggle hidden cursor (for WSL)");
-    ImGui::Text("T - Toggle floating camera");
-    ImGui::Text("G - Togle fullscreen mode");
-    ImGui::Text("Esc - Close applicaiton");
     ImGui::End();
 
     // Update time logic
@@ -70,11 +67,18 @@ void SceneRoom::update(double currentTime)
 
 void SceneRoom::draw()
 {
-    gl::clear(Color::gray(0.2f));           // clear screen
-    gl::drawCube(vec3(), vec3(2));          // draw cube
-    mCam.lookAt(vec3());                    // camera look at cube
+    // Gray Background
+    gl::clear(Color::gray(0.2f));
+
+    // Set up the camera
+    gl::ScopedMatrices push;
     gl::setMatrices(mCam);                  // set matrix scene to match the camera
-    // mSphere->draw();                        // draw sphere
+
+    // Enable depth buffer
+    gl::ScopedDepth depth( true );
+
+    // Draw Plane Floor
+    mPlane->draw();
 }
 
 Camera* SceneRoom::getCamera()
@@ -90,16 +94,6 @@ void SceneRoom::handleKeyDown(KeyEvent event)
         mCam.toggleFloating();
     if (event.getCode() == KeyEvent::KEY_h)
         mCam.toggleHiddenCursor(mGlfwWindowRef);
-
-    // For testing
-    if (event.getCode() == KeyEvent::KEY_i)
-        mCam.move(MOVEMENT::FORWARD, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_k)
-        mCam.move(MOVEMENT::BACKWARD, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_j)
-        mCam.move(MOVEMENT::LEFT, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_l)
-        mCam.move(MOVEMENT::RIGHT, mTimeOffset);
 }
 
 void SceneRoom::handleMouseMove(MouseEvent event)

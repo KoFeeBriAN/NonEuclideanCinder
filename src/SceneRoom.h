@@ -11,10 +11,13 @@ using namespace ci;
 class SceneRoom : public Scene {
 private:
     CameraFP mCam;
-    gl::BatchRef mSphere;
-    gl::TextureRef mTexture;
-    gl::GlslProgRef mGlsl;
+    gl::BatchRef mPlane;
+    gl::TextureRef mPlaneTexture;
+    gl::GlslProgRef mPlaneShader;
 
+    gl::BatchRef mWall[4];
+    gl::TextureRef mWallTexture;
+    gl::GlslProgRef mWallShader;
     // Camera attributes
     ivec2 lastPos;
     ivec2 currentPos;

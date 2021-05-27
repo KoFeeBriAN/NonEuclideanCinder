@@ -22,7 +22,7 @@ void CameraFP::processMouse(float xoffset, float yoffset)
     newDir = glm::normalize(newDir);
 
     string output = "New dir" + to_string(newDir.x) + to_string(newDir.y) + to_string(newDir.z);
-    CI_LOG_D(output);
+    // CI_LOG_D(output);
 
     mTarget = mEyePoint + newDir;
     lookAt(mTarget);
@@ -74,13 +74,15 @@ void CameraFP::freeze(GLFWwindow* window)
 void CameraFP::unfreeze(GLFWwindow* window)
 {
     mFrozen = false;
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void CameraFP::showCursor(GLFWwindow* window)
 {
     mHidden = false;
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 void CameraFP::hideCursor(GLFWwindow* window)
 {

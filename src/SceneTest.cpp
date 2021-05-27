@@ -19,7 +19,8 @@ void SceneTest::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mGlsl = gl::getStockShader(shader);
     auto sphere = geom::Sphere().subdivisions(50);
     mSphere = gl::Batch::create(sphere, mGlsl);
-    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     // setFullScreen(true);
 
     ImGui::Initialize();
