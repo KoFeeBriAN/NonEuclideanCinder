@@ -14,8 +14,10 @@ private:
     CameraFP mCam;
     gl::TextureRef mFloorTex;
     gl::TextureRef mTunnelTex;
+    gl::TextureCubeMapRef mSkyboxTex;
     gl::GlslProgRef mTexGlsl;
     gl::BatchRef mFloorBatch;
+    gl::BatchRef mSkyboxBatch;
     std::vector<gl::BatchRef> mTunnelBatches;
 
     // Camera attributes

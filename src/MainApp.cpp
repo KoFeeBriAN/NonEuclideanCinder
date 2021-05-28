@@ -88,6 +88,9 @@ void MainApp::setup()
 {
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
     mSources.insert({ "rock-tunnel", loadAsset("cartoon-rock-texture.jpg") });
+    mSources.insert({ "galaxy-texture", loadAsset("galaxy-skybox.png") });
+    mSources.insert({ "skybox.vert", loadAsset("skybox.vert") });
+    mSources.insert({ "skybox.frag", loadAsset("skybox.frag") });
     setWindowSize(mWindowWidth, mWindowHeight);
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);

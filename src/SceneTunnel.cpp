@@ -17,12 +17,19 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     // setup texture
     mFloorTex = gl::Texture::create(loadImage(assets.at("checkerboard.png")));
     mTunnelTex = gl::Texture::create(loadImage(assets.at("rock-tunnel")));
+    mSkyboxTex = gl::TextureCubeMap::create(loadImage(assets.at("galaxy-texture")),
+        gl::TextureCubeMap::Format().mipmap());
 
     // setup glsl program
     mTexGlsl = gl::getStockShader(gl::ShaderDef().texture());
+    auto skyboxGlsl = gl::GlslProg::create(assets.at("skybox.vert"), assets.at("skybox.frag"));
+
+    // setup skybox
+    mSkyboxBatch = gl::Batch::create(geom::Cube().size(vec3(300)), skyboxGlsl);
 
     // setup floor
     mFloorBatch = gl::Batch::create(geom::Plane().size({ 69, 69 }), mTexGlsl);
+    mFloorBatch->getGlslProg()->uniform("uCubeMapTex", 0);
 
     // setup Tunnel1
     auto m1 = geom::Cube().size({ 1, 6, 10 }) >> geom::Translate(vec3(-10, 3, -5));
@@ -31,6 +38,14 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     mTunnelBatches.push_back(gl::Batch::create(m1, mTexGlsl));
     mTunnelBatches.push_back(gl::Batch::create(m2, mTexGlsl));
     mTunnelBatches.push_back(gl::Batch::create(m3, mTexGlsl));
+
+    // setup Tunnel2
+    auto n1 = geom::Cube().size({ 1, 6, 20 }) >> geom::Translate(vec3(10, 3, -10));
+    auto n2 = geom::Cube().size({ 6.5, 1, 20 }) >> geom::Translate(vec3(12.75, 6.5, -10));
+    auto n3 = n1 >> geom::Translate(vec3(5.5, 0, 0));
+    mTunnelBatches.push_back(gl::Batch::create(n1, mTexGlsl));
+    mTunnelBatches.push_back(gl::Batch::create(n2, mTexGlsl));
+    mTunnelBatches.push_back(gl::Batch::create(n3, mTexGlsl));
 
     // setFullScreen(true);
 
@@ -88,6 +103,9 @@ void SceneTunnel::draw()
 
     mFloorTex->bind();
     mFloorBatch->draw();
+
+    mSkyboxTex->bind();
+    mSkyboxBatch->draw();
 }
 
 Camera* SceneTunnel::getCamera()
