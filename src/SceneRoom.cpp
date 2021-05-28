@@ -1,9 +1,9 @@
 #include "SceneRoom.h"
 
+#include "cinder/gl/gl.h"
 #include "cinder/CinderImGui.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/wrapper.h"
-#include "cinder/gl/gl.h"
 #include "cinder/Log.h"
 
 using namespace ci;
@@ -19,17 +19,17 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // initialize camera properties
-    mCam.setEyePoint({ 0, 10, 0 });                  // set camera position
-    mCam.lookAt(vec3(1., 0., 0.));                // set view direction
+    mCam.setEyePoint({ 0, 10, 0 });             // set camera position
+    mCam.lookAt({1., 0., 0.});                  // set view direction
 
     // Setup Parameter
-    mRoomSize = glm::vec3(100., 20., 100.);
+    mRoomSize = glm::vec3(100., 50., 100.);
 
     // Setup Plane
     auto fmt = gl::Texture::Format(); 
     fmt.setWrap( GL_REPEAT, GL_REPEAT );
-    // fmt.enableMipmapping( true );
-    // fmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
+    fmt.enableMipmapping( true );
+    fmt.setMinFilter( GL_LINEAR_MIPMAP_LINEAR );
     mFloorTexture = gl::Texture::create( loadImage( assets.at("checkerboard.png") ), fmt );
 
     mFloorShader = gl::getStockShader( gl::ShaderDef().texture( mFloorTexture ).lambert() );
@@ -47,9 +47,6 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mWalls.push_back( gl::Batch::create( geom::Cube().size({ 1., mRoomSize.y, mRoomSize.z }) >> geom::Transform(geom::Translate(vec3(-mRoomSize.x / 2, mRoomSize.y / 2, 0.))), mWallShader));
     mWalls.push_back( gl::Batch::create( geom::Cube().size({ mRoomSize.x, mRoomSize.y, 1. }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, mRoomSize.z / 2))), mWallShader));
     mWalls.push_back( gl::Batch::create( geom::Cube().size({ mRoomSize.x, mRoomSize.y, 1. }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, -mRoomSize.z / 2))), mWallShader));
-    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
-    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
-    // mWalls.push_back( gl::Batch::create( geom::Cube().size(1, 1, 1) , mWallShader) );
 }
 
 void SceneRoom::update(double currentTime)
@@ -88,8 +85,8 @@ void SceneRoom::draw()
 
     // Draw Walls
     mWallTexture->bind();
-    for (auto batch: mWalls) {
-        batch->draw();
+    for (auto wall: mWalls) {
+        wall->draw();
     }
 
     // Draw Plane Floor
