@@ -21,7 +21,7 @@ protected:
     vec3 mTarget;
     float mPitch = 0;
     float mYaw = -90;
-    float mMoveSpeed = 7;
+    float mMoveSpeed = 10;
     bool mFrozen = false;
     bool mHidden = false;
     bool mFloating = true;
