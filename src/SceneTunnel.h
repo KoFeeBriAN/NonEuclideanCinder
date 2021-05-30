@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Tunnel.h"
 #include <vector>
 
 #include "CameraFP.h"
@@ -22,6 +23,9 @@ private:
     gl::BatchRef mWallBatch;
     std::vector<gl::BatchRef> mTunnelBatches;
     std::vector<gl::BatchRef> mIllutionBatches;
+
+    //Tunnel
+    Tunnel mTunnel;
 
     // Camera attributes
     ivec2 lastPos;

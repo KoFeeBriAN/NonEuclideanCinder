@@ -74,10 +74,16 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     mIllutionBatches.push_back(gl::Batch::create(mx5, textureGlsl));
     mIllutionBatches.push_back(gl::Batch::create(mx6, textureGlsl));
 
+    // setup tunnel
+    mTunnel.setCount(10);
+    mTunnel.setPosition(vec3(0, 3, -5));
+    mTunnel.setTexture(assets.at("rock-tunnel"));
+    mTunnel.setupTunnel();
+
     ImGui::Initialize();
 
     // initialize camera properties
-    mCam.setEyePoint({ 0, 3, 3 });
+    mCam.setEyePoint({ 0, 3, 0 });
     mCam.lookAt({ 0, 1, 3 });
     mCam.toggleFloating();
 }
@@ -152,6 +158,9 @@ void SceneTunnel::draw()
     mTunnelTex->bind();
     for (auto batch : mIllutionBatches)
         batch->draw();
+
+    // draw new Tunnel
+    mTunnel.draw();
 }
 
 Camera* SceneTunnel::getCamera()
