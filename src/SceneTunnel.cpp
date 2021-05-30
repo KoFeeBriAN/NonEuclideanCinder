@@ -117,6 +117,7 @@ void SceneTunnel::update(double currentTime)
 void SceneTunnel::draw()
 {
     gl::clear(Color::gray(0.2f));
+    gl::clear(GL_STENCIL_BITS);
     gl::enableDepthWrite();
     gl::enableDepthRead();
     gl::setMatrices(mCam);
@@ -142,7 +143,6 @@ void SceneTunnel::draw()
     gl::stencilMask(0xFF);
     gl::disableDepthWrite();
     gl::colorMask(false, false, false, false);
-    gl::clear(GL_STENCIL_BITS);
     mDoorBatch->draw();
 
     gl::enableDepthWrite();
@@ -150,7 +150,8 @@ void SceneTunnel::draw()
 
     // setup stencil for illution
     gl::stencilFunc(GL_EQUAL, 1, 0xFF);
-    gl::stencilMask(0x00);
+    gl::stencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+    gl::stencilMask(0xFF);
 
     // draw illution tunnel
     mTunnelTex->bind();
