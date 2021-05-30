@@ -19,6 +19,7 @@ private:
     gl::BatchRef mFloorBatch;
     gl::BatchRef mSkyboxBatch;
     gl::BatchRef mDoorBatch;
+    gl::BatchRef mWallBatch;
     std::vector<gl::BatchRef> mTunnelBatches;
     std::vector<gl::BatchRef> mIllutionBatches;
 

@@ -53,6 +53,13 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     mTunnelBatches.push_back(gl::Batch::create(n2, textureGlsl));
     mTunnelBatches.push_back(gl::Batch::create(n3, textureGlsl));
 
+    // setup dept wall
+    auto wall = geom::Plane();
+    wall.size(vec2(8, 20));
+    wall.normal(vec3(-1, 0, 0));
+    wall.origin(vec3(-10.51, 3, -20));
+    mWallBatch = gl::Batch::create(wall, mColorGlsl);
+
     // setup illution Tunnel
     auto mx1 = m1 >> geom::Translate(vec3(0, 0, -10));
     auto mx2 = m2 >> geom::Translate(vec3(0, 0, -10));
@@ -135,30 +142,16 @@ void SceneTunnel::draw()
     mFloorTex->bind();
     mFloorBatch->draw();
 
-    gl::enableStencilTest();
-
-    // draw door
-    gl::stencilFunc(GL_ALWAYS, 1, 0xFF);
-    gl::stencilOp(GL_ZERO, GL_ZERO, GL_REPLACE);
-    gl::stencilMask(0xFF);
-    gl::disableDepthWrite();
+    // draw depth wall
+    gl::color(Color(1, 0, 0));
     gl::colorMask(false, false, false, false);
-    mDoorBatch->draw();
-
-    gl::enableDepthWrite();
+    mWallBatch->draw();
     gl::colorMask(true, true, true, true);
-
-    // setup stencil for illution
-    gl::stencilFunc(GL_EQUAL, 1, 0xFF);
-    gl::stencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
-    gl::stencilMask(0xFF);
 
     // draw illution tunnel
     mTunnelTex->bind();
     for (auto batch : mIllutionBatches)
         batch->draw();
-
-    gl::disableStencilTest();
 }
 
 Camera* SceneTunnel::getCamera()
