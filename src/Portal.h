@@ -22,5 +22,6 @@ public:
 
     gl::BatchRef batch;
 public:
-    double distance(Camera &cam) const;
+    double distance(vec3 position) const;
+    bool inside(vec3 position) const;
 };

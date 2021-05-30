@@ -21,7 +21,7 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // initialize camera properties
-    mCam.setEyePoint({ 0, 10, 0 }); // set camera position
+    mCam.setEyePoint({ 0, 20, 0 }); // set camera position
     mCam.lookAt({ 1., 0., 0. }); // set view direction
     mCam.toggleFloating();
 
@@ -60,26 +60,26 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mPortals.resize(2);
     mPortals[0].id = 0;
     mPortals[0].size = mPortalSize;
-    mPortals[0].origin = vec3(mRoomSize.x / 2 - mWallThickness / 2 - 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, 0);
+    mPortals[0].origin = vec3(mRoomSize.x / 2 - mWallThickness / 2 - 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, 10.);
     mPortals[0].normal = vec3(-1, 0, 0);
     mPortals[0].batch = gl::Batch::create(
         geom::Plane()
-            .normal(mPortals[0].normal)
-            .size(mPortals[0].size)
-            .origin(mPortals[0].origin) >> geom::Constant( geom::COLOR, ColorAf::black() ),
-        portalShader
-    );
+                .normal(mPortals[0].normal)
+                .size(mPortals[0].size)
+                .origin(mPortals[0].origin)
+            >> geom::Constant(geom::COLOR, ColorAf::black()),
+        portalShader);
     mPortals[1].id = 1;
     mPortals[1].size = mPortalSize;
-    mPortals[1].origin = vec3(-mRoomSize.x / 2 + mWallThickness / 2 + 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, 0);
+    mPortals[1].origin = vec3(-mRoomSize.x / 2 + mWallThickness / 2 + 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, -10.0);
     mPortals[1].normal = vec3(1, 0, 0);
     mPortals[1].batch = gl::Batch::create(
         geom::Plane()
             .normal(mPortals[1].normal)
             .size(mPortals[1].size)
-            .origin(mPortals[1].origin),
-        portalShader
-    );
+            .origin(mPortals[1].origin)
+            >> geom::Constant(geom::COLOR, ColorAf::white()),
+        portalShader);
 
     // Pair the portals
     mPortalPairs[0] = 1;
@@ -190,14 +190,14 @@ void SceneRoom::processInput()
 
 bool SceneRoom::isCollidePortal(const Portal& portal)
 {
-    return portal.distance(mCam) <= 0.5f;
+    return  portal.inside(mCam.getEyePoint()) && portal.distance(mCam.getEyePoint()) <= 0.2f;
 }
 
-void SceneRoom::collidePortal(const Portal &portal) 
+void SceneRoom::collidePortal(const Portal& portal)
 {
     // Get the exit portal
     auto exitPortal = mPortals[mPortalPairs[portal.id]];
 
     // Move cam's position
-    mCam.setEyePoint(exitPortal.origin + 2.0f * exitPortal.normal);
+    mCam.setEyePoint(exitPortal.origin + 1.0f * exitPortal.normal);
 }
