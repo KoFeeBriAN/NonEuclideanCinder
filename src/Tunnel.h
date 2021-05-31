@@ -9,6 +9,7 @@ using namespace ci;
 class Tunnel {
 public:
     void setupTunnel();
+    void setupSideWall();
     void setTexture(DataSourceRef source);
     void setGlsl(gl::GlslProgRef glsl);
     void setCount(int count);
@@ -17,6 +18,7 @@ public:
 
 private:
     std::vector<gl::BatchRef> mBatches;
+    std::vector<gl::BatchRef> mWallBatches;
     gl::GlslProgRef mGlsl = gl::getStockShader(gl::ShaderDef().texture());
     gl::TextureRef mTexture;
     Color mColor = Color(1, 0, 0);

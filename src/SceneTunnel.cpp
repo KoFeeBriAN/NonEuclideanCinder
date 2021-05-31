@@ -37,14 +37,6 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     door.normal({ mDoorNormal[0], mDoorNormal[1], mDoorNormal[2] });
     mDoorBatch = gl::Batch::create(door, mColorGlsl);
 
-    // setup Tunnel1
-    auto m1 = geom::Cube().size({ 1, 6, 10 }) >> geom::Translate(vec3(-10, 3, -5));
-    auto m2 = geom::Cube().size({ 6.5, 1, 10 }) >> geom::Translate(vec3(-7.25, 6.5, -5));
-    auto m3 = m1 >> geom::Translate(vec3(5.5, 0, 0));
-    mTunnelBatches.push_back(gl::Batch::create(m1, textureGlsl));
-    mTunnelBatches.push_back(gl::Batch::create(m2, textureGlsl));
-    mTunnelBatches.push_back(gl::Batch::create(m3, textureGlsl));
-
     // setup Tunnel2
     auto n1 = geom::Cube().size({ 1, 6, 30 }) >> geom::Translate(vec3(10, 3, -15));
     auto n2 = geom::Cube().size({ 6.5, 1, 30 }) >> geom::Translate(vec3(12.75, 6.5, -15));
@@ -60,25 +52,12 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     wall.origin(vec3(-10.51, 3, -20));
     mWallBatch = gl::Batch::create(wall, mColorGlsl);
 
-    // setup illution Tunnel
-    auto mx1 = m1 >> geom::Translate(vec3(0, 0, -10));
-    auto mx2 = m2 >> geom::Translate(vec3(0, 0, -10));
-    auto mx3 = m3 >> geom::Translate(vec3(0, 0, -10));
-    auto mx4 = mx1 >> geom::Translate(vec3(0, 0, -10));
-    auto mx5 = mx2 >> geom::Translate(vec3(0, 0, -10));
-    auto mx6 = mx3 >> geom::Translate(vec3(0, 0, -10));
-    mIllutionBatches.push_back(gl::Batch::create(mx1, textureGlsl));
-    mIllutionBatches.push_back(gl::Batch::create(mx2, textureGlsl));
-    mIllutionBatches.push_back(gl::Batch::create(mx3, textureGlsl));
-    mIllutionBatches.push_back(gl::Batch::create(mx4, textureGlsl));
-    mIllutionBatches.push_back(gl::Batch::create(mx5, textureGlsl));
-    mIllutionBatches.push_back(gl::Batch::create(mx6, textureGlsl));
-
     // setup tunnel
     mTunnel.setCount(10);
-    mTunnel.setPosition(vec3(0, 3, -5));
+    mTunnel.setPosition(vec3(-5, 3, -5));
     mTunnel.setTexture(assets.at("rock-tunnel"));
     mTunnel.setupTunnel();
+    mTunnel.setupSideWall();
 
     ImGui::Initialize();
 
@@ -139,24 +118,13 @@ void SceneTunnel::draw()
     mSkyboxTex->bind();
     mSkyboxBatch->draw();
 
-    // draw tunnel
-    mTunnelTex->bind();
-    for (auto batch : mTunnelBatches)
-        batch->draw();
-
     // draw floor
     mFloorTex->bind();
     mFloorBatch->draw();
 
-    // draw depth wall
-    gl::color(Color(1, 0, 0));
-    gl::colorMask(false, false, false, false);
-    mWallBatch->draw();
-    gl::colorMask(true, true, true, true);
-
-    // draw illution tunnel
+    // draw tunnel
     mTunnelTex->bind();
-    for (auto batch : mIllutionBatches)
+    for (auto batch : mTunnelBatches)
         batch->draw();
 
     // draw new Tunnel

@@ -24,6 +24,20 @@ void Tunnel::setupTunnel()
     }
 }
 
+void Tunnel::setupSideWall()
+{
+    auto glsl = gl::getStockShader(gl::ShaderDef().color());
+
+    auto left = geom::Plane();
+    left.size(vec2(mHeight + mThickness + 0.01, mLong * (mCount - 1)));
+    left.origin(mPosition + vec3(-mWidth / 2 - mThickness - 0.01, mThickness / 2.0, -mLong - (mCount - 1) * mLong / 2.0));
+    left.normal(vec3(1, 0, 0));
+    mWallBatches.push_back(gl::Batch::create(left, glsl));
+
+    auto right = left >> geom::Translate(vec3(mWidth + 2 * mThickness + 0.02, 0, 0));
+    mWallBatches.push_back(gl::Batch::create(right, glsl));
+}
+
 void Tunnel::setTexture(DataSourceRef source)
 {
     mTexture = gl::Texture::create(loadImage(source));
@@ -48,6 +62,14 @@ void Tunnel::draw()
 {
     gl::color(mColor);
     mTexture->bind();
-    for (auto batch : mBatches)
-        batch->draw();
+    for (int i = 0; i < 3; i++)
+        mBatches[i]->draw();
+
+    gl::colorMask(false, false, false, false);
+    for (auto wallBatch : mWallBatches)
+        wallBatch->draw();
+    gl::colorMask(true, true, true, true);
+
+    for (int i = 3; i < mBatches.size(); i++)
+        mBatches[i]->draw();
 }
