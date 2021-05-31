@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Room.h"
 #include "Portal.h"
 
 #include "CameraFP.h"
@@ -17,19 +18,8 @@ private:
     // Camera Members
     CameraFP mCam;
 
-    // Room Size vec3(width, high, long)
-    glm::vec3 mRoomSize;
-
-    // Floor Members
-    gl::BatchRef mFloor;
-    gl::TextureRef mFloorTexture;
-    gl::GlslProgRef mFloorShader;
-
-    // Wall Members
-    float mWallThickness;
-    std::vector<gl::BatchRef> mWalls;
-    gl::TextureRef mWallTexture;
-    gl::GlslProgRef mWallShader;
+    // Rooms
+    std::vector<Room*> mRooms;
 
     // Portal Members
     vec2 mPortalSize;

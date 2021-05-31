@@ -1,5 +1,4 @@
 #include "SceneRoom.h"
-#include "Portal.h"
 
 #include "cinder/CinderImGui.h"
 #include "cinder/Log.h"
@@ -20,70 +19,16 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     // Initialize ImGui
     ImGui::Initialize();
 
-    // initialize camera properties
-    mCam.setEyePoint({ 0, 20, 0 }); // set camera position
-    mCam.lookAt({ 1., 0., 0. }); // set view direction
+    // Initialize camera properties
+    mCam.setEyePoint({ 0, 10, 0 }); // set camera position
+    mCam.lookAt({ 1, 0, 0 }); // set view direction
     mCam.toggleFloating();
 
-    // Setup Parameter
-    mRoomSize = glm::vec3(100., 50., 100.);
+    // Initialize rooms
+    mRooms.push_back(new Room({20, 10, 30}, {0, 0, 0}));
+    mRooms.push_back(new Room({20, 10, 20}, {30, 0, 30}));
 
-    // Setup Plane
-    auto fmt = gl::Texture::Format();
-    fmt.setWrap(GL_REPEAT, GL_REPEAT);
-    fmt.enableMipmapping(true);
-    fmt.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
-    mFloorTexture = gl::Texture::create(loadImage(assets.at("checkerboard.png")), fmt);
-
-    mFloorShader = gl::getStockShader(gl::ShaderDef().texture(mFloorTexture));
-
-    auto plane = geom::Plane().size({ mRoomSize.x, mRoomSize.z });
-
-    mFloor = gl::Batch::create(plane, mFloorShader);
-
-    // Setup Wall
-    mWallThickness = 1.0;
-
-    mWallTexture = gl::Texture::create(loadImage(assets.at("rock-toon.jpg")));
-
-    mWallShader = gl::getStockShader(gl::ShaderDef().texture(mWallTexture));
-
-    mWalls.push_back(gl::Batch::create(geom::Cube().size({ mWallThickness, mRoomSize.y, mRoomSize.z }) >> geom::Transform(geom::Translate(vec3(mRoomSize.x / 2, mRoomSize.y / 2, 0.))), mWallShader));
-    mWalls.push_back(gl::Batch::create(geom::Cube().size({ mWallThickness, mRoomSize.y, mRoomSize.z }) >> geom::Transform(geom::Translate(vec3(-mRoomSize.x / 2, mRoomSize.y / 2, 0.))), mWallShader));
-    mWalls.push_back(gl::Batch::create(geom::Cube().size({ mRoomSize.x, mRoomSize.y, mWallThickness }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, mRoomSize.z / 2))), mWallShader));
-    mWalls.push_back(gl::Batch::create(geom::Cube().size({ mRoomSize.x, mRoomSize.y, mWallThickness }) >> geom::Transform(geom::Translate(vec3(0., mRoomSize.y / 2, -mRoomSize.z / 2))), mWallShader));
-
-    // Setup Portal Doors
-    auto portalShader = gl::getStockShader(gl::ShaderDef().color());
-    mPortalSize = vec2(25., 12.);
-
-    mPortals.resize(2);
-    mPortals[0].id = 0;
-    mPortals[0].size = mPortalSize;
-    mPortals[0].origin = vec3(mRoomSize.x / 2 - mWallThickness / 2 - 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, 10.);
-    mPortals[0].normal = vec3(-1, 0, 0);
-    mPortals[0].batch = gl::Batch::create(
-        geom::Plane()
-                .normal(mPortals[0].normal)
-                .size(mPortals[0].size)
-                .origin(mPortals[0].origin)
-            >> geom::Constant(geom::COLOR, ColorAf::black()),
-        portalShader);
-    mPortals[1].id = 1;
-    mPortals[1].size = mPortalSize;
-    mPortals[1].origin = vec3(-mRoomSize.x / 2 + mWallThickness / 2 + 0.2, mRoomSize.y / 2 - mPortalSize.x / 2, -10.0);
-    mPortals[1].normal = vec3(1, 0, 0);
-    mPortals[1].batch = gl::Batch::create(
-        geom::Plane()
-            .normal(mPortals[1].normal)
-            .size(mPortals[1].size)
-            .origin(mPortals[1].origin)
-            >> geom::Constant(geom::COLOR, ColorAf::white()),
-        portalShader);
-
-    // Pair the portals
-    mPortalPairs[0] = 1;
-    mPortalPairs[1] = 0;
+    for (auto &room: mRooms) room->setup(assets);
 }
 
 void SceneRoom::update(double currentTime)
@@ -106,13 +51,6 @@ void SceneRoom::update(double currentTime)
 
     // Poll for inputs
     processInput();
-
-    // Collision logic
-    for (auto& portal : mPortals)
-        if (isCollidePortal(portal)) {
-            collidePortal(portal);
-            CI_LOG_D("wrap!");
-        }
 }
 
 void SceneRoom::draw()
@@ -127,20 +65,7 @@ void SceneRoom::draw()
     // Enable depth buffer
     gl::ScopedDepth depth(true);
 
-    // Draw Walls
-    mWallTexture->bind();
-    for (auto& wall : mWalls) {
-        wall->draw();
-    }
-
-    // Draw Plane Floor
-    mFloorTexture->bind();
-    mFloor->draw();
-
-    // Draw Portals
-    for (auto& portal : mPortals) {
-        portal.batch->draw();
-    }
+    for (auto &room: mRooms) room->draw();
 }
 
 Camera* SceneRoom::getCamera()

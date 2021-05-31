@@ -32,4 +32,8 @@ public:
     void setup(const std::unordered_map<std::string, DataSourceRef>& assets);
     void update();
     void draw();
+
+    void setFloorTexture(gl::TextureRef texture);
+    vec3 getRoomSize();
+
 };
