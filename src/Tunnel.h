@@ -11,10 +11,10 @@ public:
     void setupTunnel();
     void setupSideWall();
     void setupFrontWall();
-    void setTexture(DataSourceRef source);
-    void setGlsl(gl::GlslProgRef glsl);
+    void setTexture(const DataSourceRef& source);
+    void setGlsl(const gl::GlslProgRef& glsl);
     void setCount(int count);
-    void setPosition(vec3 position);
+    void setPosition(const vec3& position);
     void draw();
 
 private:

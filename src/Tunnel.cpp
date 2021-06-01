@@ -49,12 +49,12 @@ void Tunnel::setupFrontWall()
     mWallBatches.push_back(gl::Batch::create(front, glsl));
 }
 
-void Tunnel::setTexture(DataSourceRef source)
+void Tunnel::setTexture(const DataSourceRef& source)
 {
     mTexture = gl::Texture::create(loadImage(source));
 }
 
-void Tunnel::setGlsl(gl::GlslProgRef glsl)
+void Tunnel::setGlsl(const gl::GlslProgRef& glsl)
 {
     mGlsl = glsl;
 }
@@ -64,7 +64,7 @@ void Tunnel::setCount(int count)
     mCount = count;
 }
 
-void Tunnel::setPosition(vec3 position)
+void Tunnel::setPosition(const vec3& position)
 {
     mPosition = position;
 }

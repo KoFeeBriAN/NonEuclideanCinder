@@ -81,7 +81,6 @@ void SceneTunnel::update(double currentTime)
 void SceneTunnel::draw()
 {
     gl::clear(Color::gray(0.2f));
-    gl::clear(GL_STENCIL_BITS);
     gl::enableDepthWrite();
     gl::enableDepthRead();
     gl::setMatrices(mCam);
