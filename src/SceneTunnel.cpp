@@ -8,7 +8,6 @@ using namespace ci;
 
 void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
-
     // set GLFW
     glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -30,34 +29,18 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     // setup floor
     mFloorBatch = gl::Batch::create(geom::Plane().size({ 69, 69 }), textureGlsl);
 
-    // setup warp plane
-    auto door = geom::Plane();
-    door.origin({ mDoorPos[0], mDoorPos[1], mDoorPos[2] });
-    door.size({ mDoorSize[0], mDoorSize[1] });
-    door.normal({ mDoorNormal[0], mDoorNormal[1], mDoorNormal[2] });
-    mDoorBatch = gl::Batch::create(door, mColorGlsl);
-
-    // setup Tunnel2
-    auto n1 = geom::Cube().size({ 1, 6, 30 }) >> geom::Translate(vec3(10, 3, -15));
-    auto n2 = geom::Cube().size({ 6.5, 1, 30 }) >> geom::Translate(vec3(12.75, 6.5, -15));
-    auto n3 = n1 >> geom::Translate(vec3(5.5, 0, 0));
-    mTunnelBatches.push_back(gl::Batch::create(n1, textureGlsl));
-    mTunnelBatches.push_back(gl::Batch::create(n2, textureGlsl));
-    mTunnelBatches.push_back(gl::Batch::create(n3, textureGlsl));
-
-    // setup dept wall
-    auto wall = geom::Plane();
-    wall.size(vec2(8, 20));
-    wall.normal(vec3(-1, 0, 0));
-    wall.origin(vec3(-10.51, 3, -20));
-    mWallBatch = gl::Batch::create(wall, mColorGlsl);
-
     // setup tunnel
-    mTunnel.setCount(10);
-    mTunnel.setPosition(vec3(-5, 3, -5));
-    mTunnel.setTexture(assets.at("rock-tunnel"));
-    mTunnel.setupTunnel();
-    mTunnel.setupSideWall();
+    mShortTunnel.setCount(10);
+    mShortTunnel.setPosition(vec3(-5, 3, -5));
+    mShortTunnel.setTexture(assets.at("rock-tunnel"));
+    mShortTunnel.setupTunnel();
+    mShortTunnel.setupSideWall();
+
+    mLongTunnel.setCount(10);
+    mLongTunnel.setPosition(vec3(5, 3, -5));
+    mLongTunnel.setTexture(assets.at("rock-tunnel"));
+    mLongTunnel.setupTunnel();
+    mLongTunnel.setupFrontWall();
 
     ImGui::Initialize();
 
@@ -69,20 +52,9 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
 
 void SceneTunnel::update(double currentTime)
 {
-    // update Door geom and batch
-    auto door = geom::Plane();
-    door.origin({ mDoorPos[0], mDoorPos[1], mDoorPos[2] });
-    door.size({ mDoorSize[0], mDoorSize[1] });
-    door.normal({ mDoorNormal[0], mDoorNormal[1], mDoorNormal[2] });
-    mDoorBatch = gl::Batch::create(door, mColorGlsl);
-
     // Debug UI
     ImGui::Begin("Debug panel");
     ImGui::Text("Elapsed time:%.1f second", mlastTime);
-    ImGui::Text("Door property");
-    ImGui::InputFloat3("Normal", mDoorNormal, 2);
-    ImGui::InputFloat3("Position", mDoorPos, 2);
-    ImGui::InputFloat2("Size", mDoorSize, 2);
     ImGui::End();
 
     ImGui::Begin("Key biding");
@@ -122,13 +94,9 @@ void SceneTunnel::draw()
     mFloorTex->bind();
     mFloorBatch->draw();
 
-    // draw tunnel
-    mTunnelTex->bind();
-    for (auto batch : mTunnelBatches)
-        batch->draw();
-
     // draw new Tunnel
-    mTunnel.draw();
+    mShortTunnel.draw();
+    mLongTunnel.draw();
 }
 
 Camera* SceneTunnel::getCamera()

@@ -38,6 +38,17 @@ void Tunnel::setupSideWall()
     mWallBatches.push_back(gl::Batch::create(right, glsl));
 }
 
+void Tunnel::setupFrontWall()
+{
+    auto glsl = gl::getStockShader(gl::ShaderDef().color());
+
+    auto front = geom::Plane()
+                     .size(vec2(mWidth, mHeight))
+                     .origin(mPosition + vec3(0, 0, -mLong))
+                     .normal(vec3(0, 0, 1));
+    mWallBatches.push_back(gl::Batch::create(front, glsl));
+}
+
 void Tunnel::setTexture(DataSourceRef source)
 {
     mTexture = gl::Texture::create(loadImage(source));

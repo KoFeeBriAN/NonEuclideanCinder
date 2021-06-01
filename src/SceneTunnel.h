@@ -19,22 +19,14 @@ private:
     gl::GlslProgRef mColorGlsl;
     gl::BatchRef mFloorBatch;
     gl::BatchRef mSkyboxBatch;
-    gl::BatchRef mDoorBatch;
-    gl::BatchRef mWallBatch;
-    std::vector<gl::BatchRef> mTunnelBatches;
-    std::vector<gl::BatchRef> mIllutionBatches;
 
     //Tunnel
-    Tunnel mTunnel;
+    Tunnel mShortTunnel;
+    Tunnel mLongTunnel;
 
     // Camera attributes
     ivec2 lastPos;
     ivec2 currentPos;
-
-    // Debug door attribute
-    float mDoorPos[3] = { -7.25f, 3.0f };
-    float mDoorSize[2] = { 4.5f, 6.0f };
-    float mDoorNormal[3] = { 0.0f, 0.0f, 1.0f };
 
     double mlastTime;
     double mTimeOffset;

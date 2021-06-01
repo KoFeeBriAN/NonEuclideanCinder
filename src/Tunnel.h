@@ -10,6 +10,7 @@ class Tunnel {
 public:
     void setupTunnel();
     void setupSideWall();
+    void setupFrontWall();
     void setTexture(DataSourceRef source);
     void setGlsl(gl::GlslProgRef glsl);
     void setCount(int count);
