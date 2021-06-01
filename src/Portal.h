@@ -2,26 +2,36 @@
 
 #define GLFW_INCLUDE_NONE
 
-#include "cinder/Buffer.h"
+#include "cinder/gl/gl.h"
 #include "cinder/gl/Batch.h"
 #include "cinder/Camera.h"
-#include "glm/glm.hpp"
 
 using namespace ci;
-using namespace glm;
-
-
-typedef int PortalId;
 
 class Portal {
-public:
-    PortalId id;
-    vec3 normal;
-    vec3 origin;
-    vec2 size;
+protected:
+    vec2 mSize;
+    vec3 mOrigin;
+    vec3 mNormal;
 
-    gl::BatchRef batch;
+    vec3 mDestination;
+    vec3 mCameraViewDirection;
+    
+    Camera* mPortalCamera = new CameraPersp();
+    Camera* mPlayerCamera;
+
+    gl::BatchRef mBatch;
+    gl::TextureRef mTexture;
+    gl::GlslProgRef mShader;
+
 public:
-    double distance(vec3 position) const;
-    bool inside(vec3 position) const;
+    Portal() = delete;
+    Portal(vec3 origin, vec3 dest, vec3 normal);
+    ~Portal();
+    void setup();
+    void update();
+    void draw();
+
+    void setPlayerCamera(Camera &camera);
+    Camera* getPortalCamera();
 };

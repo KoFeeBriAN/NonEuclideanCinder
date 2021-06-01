@@ -32,10 +32,10 @@ void Room::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
     mWallShader = gl::getStockShader( gl::ShaderDef().texture() );
 
     // ! DO NOT SHUFFLE THIS ORDER
-    mWallPositions.push_back({ mRoomSize.x / 2, mRoomSize.y / 2, 0 });
-    mWallPositions.push_back({ -mRoomSize.x / 2, mRoomSize.y / 2, 0 });
-    mWallPositions.push_back({ 0, mRoomSize.y / 2, mRoomSize.z / 2 });
-    mWallPositions.push_back({ 0, mRoomSize.y / 2, -mRoomSize.z / 2 });
+    mWallPositions.push_back({ mRoomSize.x / 2 + mWallThickness / 2, mRoomSize.y / 2, 0 });
+    mWallPositions.push_back({ -mRoomSize.x / 2 - mWallThickness / 2, mRoomSize.y / 2, 0 });
+    mWallPositions.push_back({ 0, mRoomSize.y / 2, mRoomSize.z / 2 + mWallThickness / 2 });
+    mWallPositions.push_back({ 0, mRoomSize.y / 2, -mRoomSize.z / 2 - mWallThickness / 2 });
 
     auto wall = geom::Cube();
     mWalls.push_back(gl::Batch::create(wall.size({mWallThickness, mRoomSize.y, mRoomSize.z}) >> geom::Translate(mRoomOrigin + mWallPositions[0]), mWallShader));
@@ -52,16 +52,21 @@ void Room::update()
 
 void Room::draw()
 {
-    mFloorTexture->bind();
-    mFloor->draw();
-
     mWallTexture->bind();
     for (auto &wall: mWalls) wall->draw();
+
+    mFloorTexture->bind();
+    mFloor->draw();
 }
 
 void Room::setFloorTexture(gl::TextureRef texture)
 {
     mFloorTexture = texture;
+}
+
+void Room::setWallTexture(gl::TextureRef texture)
+{
+    mWallTexture = texture;
 }
 
 vec3 Room::getRoomSize()

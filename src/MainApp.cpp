@@ -98,6 +98,7 @@ void MainApp::setup()
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
     mSources.insert({ "rock-toon.jpg", loadAsset("rock-toon.jpg") });
     mSources.insert({ "rock-tunnel", loadAsset("cartoon-rock-texture.jpg") });
+    mSources.insert({ "wood-toon", loadAsset("wood-toon.jpg") });
 
     // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);

@@ -1,4 +1,5 @@
 #include "SceneRoom.h"
+#include "Portal.h"
 
 #include "cinder/CinderImGui.h"
 #include "cinder/Log.h"
@@ -20,15 +21,25 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // Initialize camera properties
-    mCam.setEyePoint({ 0, 10, 0 }); // set camera position
+    mCam.setEyePoint({ 0, 5, 0 }); // set camera position
     mCam.lookAt({ 1, 0, 0 }); // set view direction
     mCam.toggleFloating();
 
     // Initialize rooms
-    mRooms.push_back(new Room({20, 10, 30}, {0, 0, 0}));
-    mRooms.push_back(new Room({20, 10, 20}, {30, 0, 30}));
+    mRooms.push_back(new Room({100, 10, 100}, {0, 0, 0}));
+    mRooms.push_back(new Room({100, 10, 100}, {100, 0, 100}));
 
     for (auto &room: mRooms) room->setup(assets);
+
+    mRooms[1]->setFloorTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
+    mRooms[1]->setWallTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
+
+    // Initialize portals
+    mPortals.push_back(new Portal({0, 0, 0}, {100, 0, 100}, {1, 0, 0}));
+    // mPortals.push_back(new Portal({50, 0, 50}, {20, 10, 0}, {1, 0, 0}));
+
+    for (auto &portal: mPortals) portal->setPlayerCamera(mCam);
+    for (auto &portal: mPortals) portal->setup();
 }
 
 void SceneRoom::update(double currentTime)
@@ -51,21 +62,57 @@ void SceneRoom::update(double currentTime)
 
     // Poll for inputs
     processInput();
+
+    // Portal update
+    for (auto &portal: mPortals) portal->update();
 }
 
 void SceneRoom::draw()
 {
     // Gray Background
     gl::clear(Color::gray(0.2f));
-
-    // Set up the camera
-    gl::ScopedMatrices push;
     gl::setMatrices(mCam); // set matrix scene to match the camera
 
-    // Enable depth buffer
-    gl::ScopedDepth depth(true);
+    // Draw Portals
+    for (auto &portal: mPortals) {
+        // Disable drawing color and depth buffers
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::disableDepthWrite();
 
-    for (auto &room: mRooms) room->draw();
+        gl::enableStencilTest();
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::clear(GL_STENCIL_BUFFER_BIT);
+        gl::stencilMask(0xFF);
+
+        gl::setMatrices(mCam);
+        portal->draw();
+
+        gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        gl::enableDepthWrite();
+        gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+        
+        gl::setMatrices(*(portal->getPortalCamera()));
+        mRooms[1]->draw();
+    }
+
+    gl::disableStencilTest();
+
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::enableDepthWrite();
+    gl::clear(GL_DEPTH_BUFFER_BIT);
+    
+    gl::setMatrices(mCam);
+    for (auto &portal: mPortals) portal->draw();
+
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    // Draw rooms
+    mRooms[0]->draw();
+}
+
+void SceneRoom::drawPortal(Portal *portal) {
 }
 
 Camera* SceneRoom::getCamera()
@@ -111,18 +158,4 @@ void SceneRoom::processInput()
         mCam.move(MOVEMENT::UPWARD, mTimeOffset);
     if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         mCam.move(MOVEMENT::DOWNWARD, mTimeOffset);
-}
-
-bool SceneRoom::isCollidePortal(const Portal& portal)
-{
-    return  portal.inside(mCam.getEyePoint()) && portal.distance(mCam.getEyePoint()) <= 0.2f;
-}
-
-void SceneRoom::collidePortal(const Portal& portal)
-{
-    // Get the exit portal
-    auto exitPortal = mPortals[mPortalPairs[portal.id]];
-
-    // Move cam's position
-    mCam.setEyePoint(exitPortal.origin + 1.0f * exitPortal.normal);
 }

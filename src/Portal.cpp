@@ -1,37 +1,53 @@
 #include "Portal.h"
 
+#include "cinder/gl/Batch.h"
+#include "cinder/gl/gl.h"
 #include "cinder/Log.h"
 #include <string>
 
-double Portal::distance(vec3 position) const
+using namespace ci;
+
+Portal::Portal(vec3 origin, vec3 dest, vec3 normal)
+    : mOrigin(origin)
+    , mDestination(dest)
+    , mNormal(normal)
 {
-    float el = 0.002f;
-    auto A = normal.x;
-    auto B = normal.y;
-    auto C = normal.z;
-    auto D = -glm::dot(normal, origin);
-
-    auto distance = (A * position.x + B * position.y + C * position.z + D) / sqrt(glm::dot(normal, normal));
-
-    return std::abs(distance);
 }
 
-bool Portal::inside(vec3 position) const
+void Portal::setup()
 {
-    auto left = origin.z - size.y / 2;
-    auto right = origin.z + size.y / 2;
-    auto top = origin.y + size.x / 2;
-    auto bottom = origin.y - size.x / 2;
+    mSize = vec2({ 8, 5 });
 
-    // std::string str = "";
-    // str += "left: " + std::to_string(left) + " ";
-    // str += "right: " + std::to_string(right) + " ";
-    // str += "top: " + std::to_string(top) + " ";
-    // str += "bottom: " + std::to_string(bottom) + " \n";
-    // str += "pos z: " + std::to_string(position.z) + " ";
-    // str += "pos y: " + std::to_string(position.y) + " ";
+    // Initialize Camera
+    mPortalCamera->setEyePoint(mDestination);
+    mPortalCamera->setAspectRatio(mSize.y / mSize.x);
+    mPortalCamera->lookAt(mPortalCamera->getEyePoint() - mNormal);
 
-    // CI_LOG_D(str);
 
-    return position.z > left && position.z < right && position.y > bottom && position.y < top;
+    auto plane = geom::Plane().origin(mOrigin).size(mSize).normal(mNormal) >> geom::Translate(vec3({ 0, mSize[0] / 2, 0 }));
+    auto shader = gl::getStockShader(gl::ShaderDef().color());
+
+    mBatch = gl::Batch::create(plane, shader);
+}
+
+void Portal::update()
+{
+    CI_LOG_D(mPortalCamera->getEyePoint());
+    CI_LOG_D(mPortalCamera->getViewDirection());
+}
+
+void Portal::draw()
+{
+    gl::color(Color(1, 0, 0));
+    mBatch->draw();
+}
+
+void Portal::setPlayerCamera(Camera &camera)
+{
+    mPlayerCamera = &camera;
+}
+
+Camera* Portal::getPortalCamera()
+{
+    return mPortalCamera;
 }

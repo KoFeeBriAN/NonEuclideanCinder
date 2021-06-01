@@ -23,8 +23,7 @@ private:
 
     // Portal Members
     vec2 mPortalSize;
-    std::vector<Portal> mPortals;
-    std::map<PortalId, PortalId> mPortalPairs;
+    std::vector<Portal*> mPortals;
 
     ivec2 lastPos;
     ivec2 currentPos;
@@ -42,9 +41,8 @@ public:
     void handleMouseMove(MouseEvent event) override;
     void handleKeyDown(KeyEvent event) override;
 
-public:
-    bool isCollidePortal(const Portal &portal);
-    void collidePortal(const Portal &portal);
+    void drawPortal(Portal *portal);
+
 
 private:
     void processInput();

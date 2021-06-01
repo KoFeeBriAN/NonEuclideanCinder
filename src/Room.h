@@ -34,6 +34,7 @@ public:
     void draw();
 
     void setFloorTexture(gl::TextureRef texture);
+    void setWallTexture(gl::TextureRef texture);
     vec3 getRoomSize();
 
 };
