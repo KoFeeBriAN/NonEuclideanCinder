@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Scene.h"
-#include "Room.h"
-#include "Portal.h"
 #include "CameraFP.h"
+#include "Portal.h"
+#include "Room.h"
+#include "Scene.h"
 
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/Texture.h"
-#include <vector>
 #include <map>
+#include <vector>
 
 using namespace ci;
 
@@ -24,6 +24,9 @@ private:
     // Portal Members
     vec2 mPortalSize;
     std::vector<Portal*> mPortals;
+
+    // objects
+    gl::BatchRef mObject;
 
     ivec2 lastPos;
     ivec2 currentPos;

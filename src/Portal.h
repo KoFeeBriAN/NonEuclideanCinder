@@ -20,10 +20,12 @@ public:
     void draw();
 
     void setPlayerCamera(const CameraFP& camera);
+    static mat4 getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel);
     CameraFP* getPortalCamera();
+    mat4 getModelMatrix() const;
 
 protected:
-    vec2 mSize = vec2(3, 8);
+    vec2 mSize = vec2(3, 3);
     vec3 mOrigin;
     vec3 mNormal;
 

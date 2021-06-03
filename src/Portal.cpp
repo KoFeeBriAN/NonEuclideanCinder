@@ -38,6 +38,7 @@ void Portal::draw()
 {
     gl::pushMatrices();
     gl::setModelMatrix(mModelMatrix);
+    gl::color(Color(1, 0, 0));
     mBatch->draw();
     gl::popMatrices();
 }
@@ -47,16 +48,31 @@ void Portal::setPlayerCamera(const CameraFP& camera)
     mPlayerCamera = &camera;
 }
 
+mat4 Portal::getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel)
+{
+    return curView * curModel * glm::inverse(dstModel);
+}
+
 CameraFP* Portal::getPortalCamera()
 {
     return mPortalCamera;
+}
+
+mat4 Portal::getModelMatrix() const
+{
+    return mModelMatrix;
 }
 
 void Portal::updateModelMatrix()
 {
     mModelMatrix = glm::mat4(1.0);
     mModelMatrix = glm::translate(mModelMatrix, vec3(mOrigin));
-    mModelMatrix = glm::scale(mModelMatrix, vec3(mSize, 1));
     // hard code normal for now
-    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
+    if (mNormal == vec3(0, 0, 1))
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
+    if (mNormal == vec3(1, 0, 0)) {
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 0, 1));
+    }
+    mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x, 1.0, mSize.y));
 }
