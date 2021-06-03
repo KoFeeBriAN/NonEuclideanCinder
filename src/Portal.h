@@ -2,9 +2,9 @@
 
 #define GLFW_INCLUDE_NONE
 
-#include "cinder/gl/gl.h"
-#include "cinder/gl/Batch.h"
 #include "cinder/Camera.h"
+#include "cinder/gl/Batch.h"
+#include "cinder/gl/gl.h"
 
 using namespace ci;
 
@@ -16,7 +16,7 @@ protected:
 
     vec3 mDestination;
     vec3 mCameraViewDirection;
-    
+
     Camera* mPortalCamera = new CameraPersp();
     Camera* mPlayerCamera;
 
@@ -26,12 +26,12 @@ protected:
 
 public:
     Portal() = delete;
-    Portal(vec3 origin, vec3 dest, vec3 normal);
+    Portal(const vec3& origin, const vec3& dest, const vec3& normal);
     ~Portal();
     void setup();
     void update();
     void draw();
 
-    void setPlayerCamera(Camera &camera);
+    void setPlayerCamera(Camera& camera);
     Camera* getPortalCamera();
 };
