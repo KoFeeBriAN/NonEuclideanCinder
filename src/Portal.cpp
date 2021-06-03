@@ -14,12 +14,12 @@ Portal::Portal(const CameraFP& playerCam, const vec3& origin, const vec3& dest, 
     , mNormal(normal)
 {
     mPortalCamera = new CameraFP(playerCam);
+    mPlayerCamera = &playerCam;
+    updateModelMatrix();
 }
 
 void Portal::setup()
 {
-    mSize = vec2(8, 5);
-
     // Initialize Camera
     mPortalCamera->setEyePoint(mDestination);
 
@@ -37,17 +37,26 @@ void Portal::update()
 void Portal::draw()
 {
     gl::pushMatrices();
-
+    gl::setModelMatrix(mModelMatrix);
     mBatch->draw();
     gl::popMatrices();
 }
 
-void Portal::setPlayerCamera(Camera& camera)
+void Portal::setPlayerCamera(const CameraFP& camera)
 {
     mPlayerCamera = &camera;
 }
 
-Camera* Portal::getPortalCamera()
+CameraFP* Portal::getPortalCamera()
 {
     return mPortalCamera;
+}
+
+void Portal::updateModelMatrix()
+{
+    mModelMatrix = glm::mat4(1.0);
+    mModelMatrix = glm::translate(mModelMatrix, vec3(mOrigin));
+    mModelMatrix = glm::scale(mModelMatrix, vec3(mSize, 1));
+    // hard code normal for now
+    mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
 }
