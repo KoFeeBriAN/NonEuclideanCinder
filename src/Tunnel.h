@@ -18,7 +18,7 @@ public:
     void draw();
 
 private:
-    std::vector<gl::BatchRef> mBatches;
+    std::vector<gl::BatchRef> mTunnelBatches;
     std::vector<gl::BatchRef> mWallBatches;
     gl::GlslProgRef mGlsl = gl::getStockShader(gl::ShaderDef().texture());
     gl::TextureRef mTexture;

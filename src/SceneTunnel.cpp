@@ -27,17 +27,17 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     mSkyboxBatch->getGlslProg()->uniform("uCubeMapTex", 0);
 
     // setup floor
-    mFloorBatch = gl::Batch::create(geom::Plane().size({ 69, 69 }), textureGlsl);
+    mFloorBatch = gl::Batch::create(geom::Plane().size(vec2(100)), textureGlsl);
 
     // setup tunnel
-    mShortTunnel.setCount(10);
-    mShortTunnel.setPosition(vec3(-5, 3, -5));
+    mShortTunnel.setCount(6);
+    mShortTunnel.setPosition(vec3(-10, 3, -5));
     mShortTunnel.setTexture(assets.at("rock-tunnel"));
     mShortTunnel.setupTunnel();
     mShortTunnel.setupSideWall();
 
-    mLongTunnel.setCount(10);
-    mLongTunnel.setPosition(vec3(5, 3, -5));
+    mLongTunnel.setCount(6);
+    mLongTunnel.setPosition(vec3(10, 3, -5));
     mLongTunnel.setTexture(assets.at("rock-tunnel"));
     mLongTunnel.setupTunnel();
     mLongTunnel.setupFrontWall();

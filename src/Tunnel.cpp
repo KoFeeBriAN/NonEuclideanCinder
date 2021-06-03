@@ -12,11 +12,11 @@ void Tunnel::setupTunnel()
         >> geom::Translate(mPosition + vec3(0, (mHeight + mThickness) / 2, -mLong / 2));
     auto right = left >> geom::Translate(vec3(mWidth + mThickness, 0, 0));
 
-    mBatches.reserve(mCount * 3);
+    mTunnelBatches.reserve(mCount * 3);
     for (int i = 0; i < mCount; i++) {
-        mBatches.push_back(gl::Batch::create(left, mGlsl));
-        mBatches.push_back(gl::Batch::create(top, mGlsl));
-        mBatches.push_back(gl::Batch::create(right, mGlsl));
+        mTunnelBatches.push_back(gl::Batch::create(left, mGlsl));
+        mTunnelBatches.push_back(gl::Batch::create(top, mGlsl));
+        mTunnelBatches.push_back(gl::Batch::create(right, mGlsl));
 
         left = left >> geom::Translate(vec3(0, 0, -mLong));
         top = top >> geom::Translate(vec3(0, 0, -mLong));
@@ -74,13 +74,13 @@ void Tunnel::draw()
     gl::color(mColor);
     mTexture->bind();
     for (int i = 0; i < 3; i++)
-        mBatches[i]->draw();
+        mTunnelBatches[i]->draw();
 
     gl::colorMask(false, false, false, false);
     for (auto wallBatch : mWallBatches)
         wallBatch->draw();
     gl::colorMask(true, true, true, true);
 
-    for (int i = 3; i < mBatches.size(); i++)
-        mBatches[i]->draw();
+    for (int i = 3; i < mTunnelBatches.size(); i++)
+        mTunnelBatches[i]->draw();
 }
