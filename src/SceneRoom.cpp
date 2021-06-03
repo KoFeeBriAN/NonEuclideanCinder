@@ -27,16 +27,17 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
 
     // Initialize rooms
     mRooms.push_back(new Room({ 100, 10, 100 }, { 0, 0, 0 }));
-    mRooms.push_back(new Room({ 100, 10, 100 }, { 100, 0, 100 }));
+    mRooms.push_back(new Room({ 100, 10, 100 }, { 0, 20, 0 }));
+    // mRooms.push_back(new Room({100, 10, 100}, {100, 0, 100}));
 
     for (auto& room : mRooms)
         room->setup(assets);
 
-    mRooms[1]->setFloorTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
+    mRooms[1]->setFloorTexture(gl::Texture::create(loadImage(assets.at("wood-toon"))));
     mRooms[1]->setWallTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
 
     // Initialize portals
-    mPortals.push_back(new Portal({ 0, 0, 0 }, { 100, 0, 100 }, { 1, 0, 0 }));
+    mPortals.push_back(new Portal(mCam, { 0, 0, 0 }, { 0, 20, 0 }, { 1, 0, 0 }));
     // mPortals.push_back(new Portal({50, 0, 50}, {20, 10, 0}, {1, 0, 0}));
 
     for (auto& portal : mPortals)
@@ -98,14 +99,15 @@ void SceneRoom::draw()
         gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
 
         gl::setMatrices(*(portal->getPortalCamera()));
+        gl::drawColorCube(vec3(0, 20, 0) + vec3(-3, 0, 0), vec3(0.5));
         mRooms[1]->draw();
     }
 
     gl::disableStencilTest();
 
+    gl::clear(GL_DEPTH_BUFFER_BIT);
     gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     gl::enableDepthWrite();
-    gl::clear(GL_DEPTH_BUFFER_BIT);
 
     gl::setMatrices(mCam);
     for (auto& portal : mPortals)
@@ -115,10 +117,6 @@ void SceneRoom::draw()
 
     // Draw rooms
     mRooms[0]->draw();
-}
-
-void SceneRoom::drawPortal(Portal* portal)
-{
 }
 
 Camera* SceneRoom::getCamera()

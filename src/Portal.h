@@ -2,6 +2,8 @@
 
 #define GLFW_INCLUDE_NONE
 
+#include "CameraFP.h"
+
 #include "cinder/Camera.h"
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/gl.h"
@@ -20,13 +22,15 @@ protected:
     Camera* mPortalCamera = new CameraPersp();
     Camera* mPlayerCamera;
 
+    mat4 mModelMatrix;
+
     gl::BatchRef mBatch;
     gl::TextureRef mTexture;
     gl::GlslProgRef mShader;
 
 public:
     Portal() = delete;
-    Portal(const vec3& origin, const vec3& dest, const vec3& normal);
+    Portal(const CameraFP& playerCam, const vec3& origin, const vec3& dest, const vec3& normal);
     ~Portal();
     void setup();
     void update();
