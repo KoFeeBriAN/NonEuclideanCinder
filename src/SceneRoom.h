@@ -3,8 +3,8 @@
 #include "Scene.h"
 #include "Room.h"
 #include "Portal.h"
-
 #include "CameraFP.h"
+
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/Texture.h"
 #include <vector>
@@ -40,9 +40,6 @@ public:
     Camera* getCamera() override;
     void handleMouseMove(MouseEvent event) override;
     void handleKeyDown(KeyEvent event) override;
-
-    void drawPortal(Portal *portal);
-
 
 private:
     void processInput();
