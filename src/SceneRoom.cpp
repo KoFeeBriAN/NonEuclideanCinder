@@ -77,7 +77,7 @@ void SceneRoom::update(double currentTime)
     ImGui::Text("Elapsed time:%.1f second", mlastTime);
     ImGui::SliderFloat("Camera sensitivity", &mCam.mMouseSensitivity, 0.001, 0.3);
     ImGui::End();
-
+#include "cinder/Log.h"
     // Update time logic
     mTimeOffset = currentTime - mlastTime;
     mlastTime = currentTime;

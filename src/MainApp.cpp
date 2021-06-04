@@ -5,7 +5,7 @@
 #include "SceneTest2.h"
 #include "SceneRoom.h"
 #include "SceneTunnel.h"
-#include "SceneTunnelVertical.h"
+#include "SceneTunnelSlope.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
