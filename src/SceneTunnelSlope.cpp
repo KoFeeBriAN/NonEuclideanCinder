@@ -1,4 +1,4 @@
-#include "SceneTunnelVertical.h"
+#include "SceneTunnelSlope.h"
 
 #include "cinder/Log.h"
 #include "cinder/CinderImGui.h"
@@ -28,19 +28,16 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     mTexGlsl = gl::getStockShader(gl::ShaderDef().texture());
 
     // setup floor
-    auto floorTop = geom::Plane().size({ 32, 32 });
-
     float slopeTheta = -22.5f;
     float slopeYPos = sin(glm::radians(slopeTheta)) * 16;
     float slopeXPos = cos(glm::radians(slopeTheta)) * 32;
     float slopeXPosCompensation = 1.216;
     slopeXPos += slopeXPosCompensation;
 
-    string output = to_string(slopeXPos);
-    CI_LOG_D(output);
-
+    auto floorTop = geom::Plane().size({ 32, 32 });
     auto floorSlope = geom::Plane().size({ 32, 32 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(slopeXPos, slopeYPos, 0));
     auto floorButtom = geom::Plane().size({ 32, 32 })  >> geom::Translate(vec3(2 * slopeXPos, 2 * slopeYPos, 0));
+
     mFloorBatch1 = gl::Batch::create(floorTop, mTexGlsl);
     mFloorBatch2 = gl::Batch::create(floorSlope, mTexGlsl);
     mFloorBatch3 = gl::Batch::create(floorButtom, mTexGlsl);
