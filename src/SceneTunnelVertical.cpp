@@ -1,10 +1,16 @@
 #include "SceneTunnelVertical.h"
 
+#include "cinder/Log.h"
 #include "cinder/CinderImGui.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/wrapper.h"
 
+#include <string>
+
 using namespace ci;
+using namespace std;
+
+#define PI 3.141593
 
 void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
@@ -22,7 +28,22 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     mTexGlsl = gl::getStockShader(gl::ShaderDef().texture());
 
     // setup floor
-    mFloorBatch = gl::Batch::create(geom::Plane().size({ 69, 69 }), mTexGlsl);
+    auto floorTop = geom::Plane().size({ 32, 32 });
+
+    float slopeTheta = -22.5f;
+    float slopeYPos = sin(glm::radians(slopeTheta)) * 16;
+    float slopeXPos = cos(glm::radians(slopeTheta)) * 32;
+    float slopeXPosCompensation = 1.216;
+    slopeXPos += slopeXPosCompensation;
+
+    string output = to_string(slopeXPos);
+    CI_LOG_D(output);
+
+    auto floorSlope = geom::Plane().size({ 32, 32 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(slopeXPos, slopeYPos, 0));
+    auto floorButtom = geom::Plane().size({ 32, 32 })  >> geom::Translate(vec3(2 * slopeXPos, 2 * slopeYPos, 0));
+    mFloorBatch1 = gl::Batch::create(floorTop, mTexGlsl);
+    mFloorBatch2 = gl::Batch::create(floorSlope, mTexGlsl);
+    mFloorBatch3 = gl::Batch::create(floorButtom, mTexGlsl);
 
     // setup Tunnel1
     auto m1 = geom::Cube().size({ 1, 6, 10 }) >> geom::Translate(vec3(-10, 3, -5));
@@ -87,7 +108,9 @@ void SceneTunnelVertical::draw()
         batch->draw();
 
     mFloorTex->bind();
-    mFloorBatch->draw();
+    mFloorBatch1->draw();
+    mFloorBatch2->draw();
+    mFloorBatch3->draw();
 }
 
 Camera* SceneTunnelVertical::getCamera()

@@ -13,6 +13,7 @@
 		"random": "cpp",
 		"fstream": "cpp",
 		"functional": "cpp",
-		"new": "cpp"
+		"new": "cpp",
+		"string_view": "cpp"
 	}
 }
