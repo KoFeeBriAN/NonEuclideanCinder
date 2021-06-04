@@ -8,6 +8,11 @@
 		"list": "cpp",
 		"string": "cpp",
 		"vector": "cpp",
-		"valarray": "cpp"
+		"valarray": "cpp",
+		"bitset": "cpp",
+		"random": "cpp",
+		"fstream": "cpp",
+		"functional": "cpp",
+		"new": "cpp"
 	}
 }

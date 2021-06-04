@@ -31,6 +31,8 @@ private:
     ivec2 lastPos;
     ivec2 currentPos;
 
+    vec3 mLastCamPos;
+
     double mlastTime;
     double mTimeOffset;
     bool firstMouseMove = true;

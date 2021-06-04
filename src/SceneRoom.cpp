@@ -21,8 +21,11 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // Initialize camera properties
-    mCam.setEyePoint({ 0, 5, 0 }); // set camera position
-    mCam.lookAt({ 0, 0, 0 }); // set view direction
+    
+    mCam.setEyePoint({ 0, 5, -5 }); // set camera position
+    mLastCamPos = mCam.getEyePoint(); 
+
+    mCam.lookAt({ 0, 0, -1 }); // set view direction
     mCam.toggleFloating();
 
     // Initialize rooms
@@ -37,8 +40,12 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mRooms[1]->setWallTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
 
     // Initialize portals
-    mPortals.push_back(new Portal(mCam, vec3(0, 4, 0), vec3(0, 20, 0), vec3(1, 0, 0)));
-    mPortals.push_back(new Portal(mCam, vec3(10, 34, 5), vec3(0, 20, 0), vec3(0, 0, 1)));
+    mPortals.push_back(new Portal(mCam, vec3(0, 4, 0), Portal::NORMAL_DIR::X));
+    mPortals.push_back(new Portal(mCam, vec3(10, 34, 5), Portal::NORMAL_DIR::Z));
+
+    // Linked Portals
+    mPortals[0]->setLinkedPortal(*mPortals[1]);
+    mPortals[1]->setLinkedPortal(*mPortals[0]);
 
     for (auto& portal : mPortals)
         portal->setPlayerCamera(mCam);
@@ -74,6 +81,17 @@ void SceneRoom::update(double currentTime)
     // Portal update
     for (auto& portal : mPortals)
         portal->update();
+
+    for (auto& portal : mPortals) {
+        if (portal->isIntersect(mLastCamPos, mCam.getEyePoint())) {
+            CI_LOG_D("warp!");
+            portal->warp(mCam);
+        }
+    }
+
+    // Update Last Position
+    mLastCamPos = mCam.getEyePoint();
+    
 }
 
 void SceneRoom::draw()
@@ -82,28 +100,32 @@ void SceneRoom::draw()
     gl::clear(Color::gray(0.2f));
     gl::setMatrices(mCam); // set matrix scene to match the camera
 
+    
     gl::enableStencilTest();
 
-    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    gl::depthMask(GL_FALSE);
-    gl::stencilFunc(GL_NEVER, 0, 0xFF);
-    gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
-    gl::clear(GL_STENCIL_BUFFER_BIT);
-    for (auto portal : mPortals)
+    for (auto& portal : mPortals) {
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::depthMask(GL_FALSE);
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        gl::clear(GL_STENCIL_BUFFER_BIT);
+        
         portal->draw();
 
-    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    gl::depthMask(GL_TRUE);
-    gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
-    gl::pushViewMatrix();
-    mat4 newView = Portal::getNewViewMatrix(gl::getViewMatrix(), mPortals[0]->getModelMatrix(), mPortals[1]->getModelMatrix());
-    gl::setViewMatrix(newView);
-    for (auto room : mRooms)
-        room->draw();
-    gl::color(Color(1, 0, 0));
-    mObject->draw();
-    gl::popViewMatrix();
+        gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        gl::depthMask(GL_TRUE);
+        gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+        gl::pushViewMatrix();
+
+        mat4 newView = Portal::getNewViewMatrix(gl::getViewMatrix(), portal->getModelMatrix(), portal->getLinkedPortal()->getModelMatrix());
+        gl::setViewMatrix(newView);
+        for (auto room : mRooms)
+            room->draw();
+
+        mObject->draw();
+        gl::popViewMatrix();
+    }
 
     gl::disableStencilTest();
 

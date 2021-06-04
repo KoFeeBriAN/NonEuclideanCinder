@@ -113,3 +113,8 @@ void CameraFP::toggleFloating()
 {
     mFloating = !mFloating;
 }
+
+vec3 CameraFP::getTarget()
+{
+    return mTarget;
+}

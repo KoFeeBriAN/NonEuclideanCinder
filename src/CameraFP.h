@@ -38,4 +38,6 @@ public:
     void toggleHiddenCursor(GLFWwindow* window);
     void toggleFreeze(GLFWwindow* window);
     void toggleFloating();
+
+    vec3 getTarget();
 };
