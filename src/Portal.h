@@ -24,6 +24,8 @@ public:
     void update();
     void draw();
 
+    void setSize(vec2 size);
+    void setOrigin(vec3 origin);
     void setPlayerCamera(const CameraFP& camera);
     void setLinkedPortal(Portal& portal);
     

@@ -27,6 +27,7 @@ private:
 
     // objects
     gl::BatchRef mObject;
+    gl::BatchRef mObject2;
 
     ivec2 lastPos;
     ivec2 currentPos;

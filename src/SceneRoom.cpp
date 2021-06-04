@@ -29,9 +29,12 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mCam.toggleFloating();
 
     // Initialize rooms
-    mRooms.push_back(new Room({ 100, 10, 100 }, { 0, 0, 0 }));
-    mRooms.push_back(new Room({ 100, 10, 100 }, { 0, 30, 0 }));
+    mRooms.push_back(new Room({ 100, 20, 100 }, { 0, 0, 0 }));
+    mRooms.push_back(new Room({ 100, 20, 100 }, { 100, 0, 0 }));
+    mRooms.push_back(new Room({ 100, 20, 100 }, { 0, 0, 100 }));
     // mRooms.push_back(new Room({100, 10, 100}, {100, 0, 100}));
+    mRooms[1]->setRotateRoom(-90.0f);
+    mRooms[2]->setRotateRoom(90.0f);
 
     for (auto& room : mRooms)
         room->setup(assets);
@@ -55,6 +58,10 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     auto teapot = geom::Teapot() >> geom::Translate(vec3(5, 5, 5));
     auto glsl = gl::getStockShader(gl::ShaderDef().color());
     mObject = gl::Batch::create(teapot, glsl);
+
+    auto sphere = geom::Sphere() >> geom::Translate(vec3(13, 34, 8));
+    auto glsl2 = gl::getStockShader(gl::ShaderDef().color());
+    mObject2 = gl::Batch::create(sphere, glsl2);
 }
 
 void SceneRoom::update(double currentTime)
@@ -84,8 +91,8 @@ void SceneRoom::update(double currentTime)
 
     for (auto& portal : mPortals) {
         if (portal->isIntersect(mLastCamPos, mCam.getEyePoint())) {
-            CI_LOG_D("warp!");
             portal->warp(mCam);
+            break;
         }
     }
 
@@ -122,8 +129,8 @@ void SceneRoom::draw()
         gl::setViewMatrix(newView);
         for (auto room : mRooms)
             room->draw();
-
         mObject->draw();
+        mObject2->draw();
         gl::popViewMatrix();
     }
 
@@ -131,14 +138,16 @@ void SceneRoom::draw()
 
     gl::clear(GL_DEPTH_BUFFER_BIT);
     gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::setMatrices(mCam);
     for (auto portal : mPortals)
         portal->draw();
     gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     for (auto room : mRooms)
         room->draw();
-    gl::color(Color(1, 0, 0));
+    
     mObject->draw();
+    mObject2->draw();
 }
 
 Camera* SceneRoom::getCamera()

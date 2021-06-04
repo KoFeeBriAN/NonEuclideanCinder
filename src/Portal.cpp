@@ -54,8 +54,10 @@ void Portal::draw()
 {
     gl::pushMatrices();
     gl::setModelMatrix(mModelMatrix);
+    gl::enableFaceCulling(true);
     gl::color(Color(1, 0, 0));
     mBatch->draw();
+    gl::enableFaceCulling(false);
     gl::popMatrices();
 }
 
@@ -71,7 +73,7 @@ void Portal::setLinkedPortal(Portal& portal)
 
 mat4 Portal::getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel)
 {
-    return curView * curModel * glm::inverse(dstModel);
+    return curView * curModel *  glm::inverse(dstModel);
 }
 
 CameraFP* Portal::getPortalCamera()
@@ -126,8 +128,8 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
                        vec3(p[i + 2].x - p[i].x, p[i + 2].y - p[i].y, p[i + 2].z - p[i].z)))
             * vec3(la.x - p[i].x, la.y - p[i].y, la.z - p[i].z);
         float t = tuv.x, u = tuv.y, v = tuv.z;
-        if (t >= 0-1e-4 && t <= 1+1e-4) {
-            if (u >= 0-1e-4 && u <= 1+1e-4 && v >= 0-1e-4 && v <= 1+1e-4 && (u + v) <= 1+1e-4) return 1;
+        if (t >= 0-1e-3 && t <= 1+1e-3) {
+            if (u >= 0-1e-3 && u <= 1+1e-3 && v >= 0-1e-3 && v <= 1+1e-3 && (u + v) <= 1+1e-3) return 1;
         }
     }
     return 0;
@@ -135,18 +137,21 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 
 void Portal::warp(CameraFP& camera)
 {
-    float offset = 1.0f;
+    float offset = 0.7f;
     vec3 destPos = mLinkedPortal->mOrigin;
     vec3 destNorm = mLinkedPortal->mNormal;
 
     // Update Camera Position
     camera.setEyePoint(destPos + offset * destNorm);
 
-    // Update Camera View
-    float angle = glm::acos(glm::dot(mNormal, destNorm));
-    vec3 newDir = glm::rotate(camera.getViewDirection(), -angle, vec3(0, 1, 0));
+    mat4 newView = getNewViewMatrix(gl::getViewMatrix(), getModelMatrix(), getLinkedPortal()->getModelMatrix());
+    camera.setViewMatrix(newView);
 
-    camera.lookAt(camera.getEyePoint() + newDir);
+    // Update Camera View
+    // float angle = glm::acos(glm::dot(mNormal, destNorm));
+    // vec3 newDir = glm::rotate(camera.getViewDirection(), -angle, vec3(0, 1, 0));
+
+    // camera.lookAt(destPos + newDir);
 }
 
 // mat3 Portal::rotateAlign(vec3 v1, vec3 v2)

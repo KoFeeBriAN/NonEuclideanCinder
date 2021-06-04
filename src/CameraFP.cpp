@@ -118,3 +118,9 @@ vec3 CameraFP::getTarget()
 {
     return mTarget;
 }
+
+void CameraFP::setViewMatrix(mat4 viewMat)
+{
+    mViewMatrix = viewMat;
+    calcViewMatrix();
+}

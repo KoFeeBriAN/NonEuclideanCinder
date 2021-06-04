@@ -14,6 +14,8 @@ protected:
     vec3 mRoomOrigin;                           // Origin Position
     float mWallThickness;                       // Wall thickness
 
+    float mRotDeg = 0.0f;
+
     // Floor attributes
     gl::BatchRef mFloor;                        // Floor Mesh
     gl::TextureRef mFloorTexture;               // Floor Texture
@@ -35,6 +37,7 @@ public:
 
     void setFloorTexture(gl::TextureRef texture);
     void setWallTexture(gl::TextureRef texture);
+    void setRotateRoom(float deg);
     vec3 getRoomSize();
 
 };
