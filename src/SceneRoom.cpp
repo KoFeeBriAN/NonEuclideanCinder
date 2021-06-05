@@ -32,7 +32,6 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mRooms.push_back(new Room({ 100, 20, 100 }, { 0, 0, 0 }));
     mRooms.push_back(new Room({ 100, 20, 100 }, { 100, 0, 0 }));
     mRooms.push_back(new Room({ 100, 20, 100 }, { 0, 0, 100 }));
-    // mRooms.push_back(new Room({100, 10, 100}, {100, 0, 100}));
     mRooms[1]->setRotateRoom(-90.0f);
     mRooms[2]->setRotateRoom(90.0f);
 
@@ -43,8 +42,13 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mRooms[1]->setWallTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
 
     // Initialize portals
-    mPortals.push_back(new Portal(mCam, vec3(0, 4, 0), Portal::NORMAL_DIR::X));
-    mPortals.push_back(new Portal(mCam, vec3(10, 34, 5), Portal::NORMAL_DIR::Z));
+    mPortals.push_back(new Portal(mCam));
+    mPortals.push_back(new Portal(mCam));
+    mPortals[0]->setOrigin(vec3(100 + 50 - 10, 10, 0 + 50 + 0.1));
+    mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_Z);
+    mPortals[1]->setOrigin(vec3(0 + 50 + 0.1, 10, 100 + 50 - 10));
+    mPortals[0]->setSize({20, 20});
+    mPortals[1]->setSize({20, 20});
 
     // Linked Portals
     mPortals[0]->setLinkedPortal(*mPortals[1]);
@@ -125,7 +129,7 @@ void SceneRoom::draw()
         gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
         gl::pushViewMatrix();
 
-        mat4 newView = Portal::getNewViewMatrix(gl::getViewMatrix(), portal->getModelMatrix(), portal->getLinkedPortal()->getModelMatrix());
+        mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), portal->getModelMatrix(), portal->getLinkedPortal()->getModelMatrix());
         gl::setViewMatrix(newView);
         for (auto room : mRooms)
             room->draw();
