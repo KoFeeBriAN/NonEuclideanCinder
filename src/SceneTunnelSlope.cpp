@@ -43,8 +43,8 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     mFloorBatch3 = gl::Batch::create(floorButtom, mTexGlsl);
 
     // setup Tunnel1
-    auto m1 = geom::Cube().size({ 10, 5, 1 }) >> geom::Translate(vec3(0, 3, -2.5));
-    auto m2 = geom::Cube().size({ 10, 1, 6 }) >> geom::Translate(vec3(0, 6, 0));
+    auto m1 = geom::Cube().size({ 32, 5, 1 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(0, 3, -2.5)) >> geom::Translate(vec3((32 + slopeXPos + 0.6f) / 2, slopeYPos - 0.65f, 0));
+    auto m2 = geom::Cube().size({ 32, 1, 6 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(0, 6, 0)) >> geom::Translate(vec3(((32 + slopeXPos + 0.6f) / 2) + 1.15f, slopeYPos - 0.65f - 0.23f, 0));
     auto m3 = m1 >> geom::Translate(vec3(0, 0, 5));
     mTunnelBatches.push_back(gl::Batch::create(m1, mTexGlsl));
     mTunnelBatches.push_back(gl::Batch::create(m2, mTexGlsl));
