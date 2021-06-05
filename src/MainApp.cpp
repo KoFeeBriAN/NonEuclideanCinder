@@ -1,9 +1,11 @@
 #define GLFW_INCLUDE_NONE
 
 #include "Resources.h"
+#include "SceneRoom.h"
 #include "SceneTest.h"
 #include "SceneTest2.h"
 #include "SceneTunnel.h"
+#include "SceneTunnelVertical.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -16,7 +18,9 @@ using namespace ci::app;
 enum class SCENE {
     TEST,
     TEST2,
-    TUNNEL
+    ROOM,
+    TUNNEL,
+    TUNNEL_VERTICAL
 };
 
 class MainApp : public App {
@@ -42,6 +46,7 @@ private:
 
 void MainApp::prepareSettings(Settings* settings)
 {
+    // Set App Resizable prop to TRUE
     settings->setResizable(true);
 }
 
@@ -52,17 +57,24 @@ void MainApp::mouseMove(MouseEvent event)
 
 void MainApp::keyDown(KeyEvent event)
 {
+    // Exit the app
     if (event.getCode() == KeyEvent::KEY_ESCAPE)
         quit();
+    // toggle full screen
     if (event.getCode() == KeyEvent::KEY_g)
         toggleFullscreen();
 
+    // Handle Switch Scenes
     if (event.getCode() == KeyEvent::KEY_1)
         switchScene(SCENE::TEST);
     if (event.getCode() == KeyEvent::KEY_2)
         switchScene(SCENE::TEST2);
     if (event.getCode() == KeyEvent::KEY_3)
+        switchScene(SCENE::ROOM); // Mutiple Rooms
+    if (event.getCode() == KeyEvent::KEY_4)
         switchScene(SCENE::TUNNEL);
+    if (event.getCode() == KeyEvent::KEY_5)
+        switchScene(SCENE::TUNNEL_VERTICAL);
 
     currentScene->handleKeyDown(event);
 }
@@ -86,12 +98,19 @@ void MainApp::toggleFullscreen()
 
 void MainApp::setup()
 {
+    // Load Resources
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
+    mSources.insert({ "rock-toon.jpg", loadAsset("rock-toon.jpg") });
     mSources.insert({ "rock-tunnel", loadAsset("cartoon-rock-texture.jpg") });
     mSources.insert({ "galaxy-texture", loadAsset("galaxy-skybox.png") });
     mSources.insert({ "skybox.vert", loadAsset("skybox.vert") });
     mSources.insert({ "skybox.frag", loadAsset("skybox.frag") });
+    mSources.insert({ "wood-toon", loadAsset("wood-toon.jpg") });
+
+    // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);
+
+    // Setup Scene
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);
 }
@@ -112,18 +131,29 @@ void MainApp::switchScene(SCENE scene)
         delete currentScene;
 
     switch (scene) {
+    case SCENE::TEST:
+        currentScene = new SceneTest();
+        break;
     case SCENE::TEST2:
         currentScene = new SceneTest2();
+        break;
+    case SCENE::ROOM:
+        currentScene = new SceneRoom();
         break;
 
     case SCENE::TUNNEL:
         currentScene = new SceneTunnel();
         break;
+    case SCENE::TUNNEL_VERTICAL:
+        currentScene = new SceneTunnelVertical();
+        break;
 
     default:
-        currentScene = new SceneTest();
+        // for testing ROOM SCENE
+        currentScene = new SceneRoom();
         break;
     }
+
     currentScene->setWindow((GLFWwindow*)getWindow()->getNative());
     currentScene->setup(mSources);
 }

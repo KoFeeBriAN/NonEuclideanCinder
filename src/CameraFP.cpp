@@ -10,22 +10,25 @@ void CameraFP::processMouse(float xoffset, float yoffset)
     if (mFrozen)
         return;
 
-    mYaw += xoffset * mMouseSensitivity;
-    mPitch -= yoffset * mMouseSensitivity;
+    // mYaw += xoffset * mMouseSensitivity;
+    // mPitch -= yoffset * mMouseSensitivity;
 
-    mPitch = glm::clamp(mPitch, -89.0f, 89.0f);
+    // mPitch = glm::clamp(mPitch, -89.0f, 89.0f);
 
-    vec3 newDir;
-    newDir.x = cos(toRadians(mYaw)) * cos(toRadians(mPitch));
-    newDir.y = sin(toRadians(mPitch));
-    newDir.z = sin(toRadians(mYaw)) * cos(toRadians(mPitch));
-    newDir = glm::normalize(newDir);
+    // vec3 newDir;
+    // newDir.x = cos(toRadians(mYaw)) * cos(toRadians(mPitch));
+    // newDir.y = sin(toRadians(mPitch));
+    // newDir.z = sin(toRadians(mYaw)) * cos(toRadians(mPitch));
+    // newDir = glm::normalize(newDir);
 
-    string output = "New dir" + to_string(newDir.x) + to_string(newDir.y) + to_string(newDir.z);
-    CI_LOG_D(output);
+    // string output = "New dir" + to_string(newDir.x) + to_string(newDir.y) + to_string(newDir.z);
+    // // CI_LOG_D(output);
 
-    mTarget = mEyePoint + newDir;
-    lookAt(mTarget);
+    // mTarget = mEyePoint + newDir;
+
+    vec3 newDir = glm::rotate(mViewDirection, -glm::radians(xoffset * mMouseSensitivity), mV);
+    newDir = glm::rotate(newDir, -glm::radians(yoffset * mMouseSensitivity), mU);
+    lookAt(mEyePoint + newDir);
 }
 
 void CameraFP::move(MOVEMENT movement, double timeOffset)
@@ -75,13 +78,15 @@ void CameraFP::freeze(GLFWwindow* window)
 void CameraFP::unfreeze(GLFWwindow* window)
 {
     mFrozen = false;
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void CameraFP::showCursor(GLFWwindow* window)
 {
     mHidden = false;
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 void CameraFP::hideCursor(GLFWwindow* window)
 {
@@ -115,4 +120,10 @@ void CameraFP::toggleFloating()
 vec3 CameraFP::getTarget() const
 {
     return mTarget;
+}
+
+void CameraFP::setViewMatrix(mat4 viewMat)
+{
+    mViewMatrix = viewMat;
+    calcViewMatrix();
 }
