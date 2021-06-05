@@ -49,9 +49,13 @@ void Tunnel::setupFrontWall()
     mWallBatches.push_back(gl::Batch::create(front, glsl));
 }
 
-void Tunnel::setTexture(const DataSourceRef& source)
+void Tunnel::setTexture(const gl::TextureRef& texture)
 {
-    mTexture = gl::Texture::create(loadImage(source));
+    // auto format = gl::Texture::Format();
+    // format.setWrap(GL_REPEAT, GL_REPEAT);
+    // format.enableMipmapping();
+    // mTexture = gl::Texture::create(loadImage(source), format);
+    mTexture = texture;
 }
 
 void Tunnel::setGlsl(const gl::GlslProgRef& glsl)

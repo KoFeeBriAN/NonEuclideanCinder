@@ -5,6 +5,7 @@
 #include "SceneTest.h"
 #include "SceneTest2.h"
 #include "SceneTunnel.h"
+#include "SceneTunnelPortal.h"
 #include "SceneTunnelVertical.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
@@ -20,6 +21,7 @@ enum class SCENE {
     TEST2,
     ROOM,
     TUNNEL,
+    TUNNEL_PORTAL,
     TUNNEL_VERTICAL
 };
 
@@ -75,6 +77,8 @@ void MainApp::keyDown(KeyEvent event)
         switchScene(SCENE::TUNNEL);
     if (event.getCode() == KeyEvent::KEY_5)
         switchScene(SCENE::TUNNEL_VERTICAL);
+    if (event.getCode() == KeyEvent::KEY_6)
+        switchScene(SCENE::TUNNEL_PORTAL);
 
     currentScene->handleKeyDown(event);
 }
@@ -140,9 +144,11 @@ void MainApp::switchScene(SCENE scene)
     case SCENE::ROOM:
         currentScene = new SceneRoom();
         break;
-
     case SCENE::TUNNEL:
         currentScene = new SceneTunnel();
+        break;
+    case SCENE::TUNNEL_PORTAL:
+        currentScene = new SceneTunnelPortal();
         break;
     case SCENE::TUNNEL_VERTICAL:
         currentScene = new SceneTunnelVertical();

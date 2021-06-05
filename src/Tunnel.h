@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cinder/gl/Batch.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/Texture.h"
@@ -11,7 +13,7 @@ public:
     void setupTunnel();
     void setupSideWall();
     void setupFrontWall();
-    void setTexture(const DataSourceRef& source);
+    void setTexture(const gl::TextureRef& texture);
     void setGlsl(const gl::GlslProgRef& glsl);
     void setCount(int count);
     void setPosition(const vec3& position);
