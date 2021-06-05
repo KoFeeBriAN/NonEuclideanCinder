@@ -73,7 +73,7 @@ void Portal::setLinkedPortal(Portal& portal)
 
 mat4 Portal::getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel)
 {
-    return curView * curModel *  glm::inverse(dstModel);
+    return curView * curModel * glm::inverse(dstModel);
 }
 
 CameraFP* Portal::getPortalCamera()
@@ -128,8 +128,9 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
                        vec3(p[i + 2].x - p[i].x, p[i + 2].y - p[i].y, p[i + 2].z - p[i].z)))
             * vec3(la.x - p[i].x, la.y - p[i].y, la.z - p[i].z);
         float t = tuv.x, u = tuv.y, v = tuv.z;
-        if (t >= 0-1e-3 && t <= 1+1e-3) {
-            if (u >= 0-1e-3 && u <= 1+1e-3 && v >= 0-1e-3 && v <= 1+1e-3 && (u + v) <= 1+1e-3) return 1;
+        if (t >= 0 - 1e-3 && t <= 1 + 1e-3) {
+            if (u >= 0 - 1e-3 && u <= 1 + 1e-3 && v >= 0 - 1e-3 && v <= 1 + 1e-3 && (u + v) <= 1 + 1e-3)
+                return 1;
         }
     }
     return 0;
@@ -144,14 +145,14 @@ void Portal::warp(CameraFP& camera)
     // Update Camera Position
     camera.setEyePoint(destPos + offset * destNorm);
 
-    mat4 newView = getNewViewMatrix(gl::getViewMatrix(), getModelMatrix(), getLinkedPortal()->getModelMatrix());
-    camera.setViewMatrix(newView);
+    // mat4 newView = getNewViewMatrix(gl::getViewMatrix(), getModelMatrix(), getLinkedPortal()->getModelMatrix());
+    // camera.setViewMatrix(newView);
 
     // Update Camera View
-    // float angle = glm::acos(glm::dot(mNormal, destNorm));
-    // vec3 newDir = glm::rotate(camera.getViewDirection(), -angle, vec3(0, 1, 0));
+    float angle = glm::acos(glm::dot(mNormal, destNorm));
+    vec3 newDir = glm::rotate(camera.getViewDirection(), -angle, vec3(0, 1, 0));
 
-    // camera.lookAt(destPos + newDir);
+    camera.lookAt(destPos + newDir);
 }
 
 // mat3 Portal::rotateAlign(vec3 v1, vec3 v2)
