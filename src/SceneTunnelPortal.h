@@ -52,6 +52,8 @@ public:
     void handleKeyDown(KeyEvent event) override;
 
     void drawSceneObjects();
+    void drawNonPortal(const glm::mat4& viewMat, const glm::mat4& projMat);
+    void drawPortalRecursive(const glm::mat4& viewMat, const glm::mat4& projMat, size_t maxRecursiveLevel, size_t recursiveLevel);
 
     void drawPortalImages();
 

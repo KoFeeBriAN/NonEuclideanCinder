@@ -40,6 +40,8 @@ public:
     mat4 getModelMatrix() const;
     Portal* getLinkedPortal();
 
+    glm::mat4 const clippedProjectMat(const glm::mat4& viewMat, glm::mat4 projMat) const;
+
 protected:
     vec2 mSize = vec2(20, 20);
     vec3 mOrigin;
@@ -61,5 +63,4 @@ protected:
     gl::GlslProgRef mShader;
 
     void updateModelMatrix();
-    // mat3 rotateAlign(vec3 v1, vec3 v2);
 };

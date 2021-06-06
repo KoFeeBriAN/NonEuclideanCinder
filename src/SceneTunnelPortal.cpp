@@ -1,6 +1,7 @@
 #include "SceneTunnelPortal.h"
 
 #include "cinder/CinderImGui.h"
+#include "cinder/Log.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/wrapper.h"
 
@@ -143,45 +144,145 @@ void SceneTunnelPortal::update(double currentTime)
     processInput();
 }
 
+void SceneTunnelPortal::drawNonPortal(const glm::mat4& viewMat, const glm::mat4& projMat)
+{
+    gl::setViewMatrix(viewMat);
+    gl::setProjectionMatrix(projMat);
+    drawSceneObjects();
+}
+
+void SceneTunnelPortal::drawPortalRecursive(const glm::mat4& viewMat, const glm::mat4& projMat, size_t maxRecuesiveLevel, size_t recursiveLevel)
+{
+    gl::pushMatrices();
+
+    for (auto& portal : mPortals) {
+        // Disable color mask and depth drawing
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::disableDepthWrite();
+        gl::disableDepthRead();
+
+        gl::enableStencilTest();
+        gl::stencilFunc(GL_NOTEQUAL, recursiveLevel, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        gl::stencilMask(0xFF);
+        gl::clear(GL_STENCIL_BUFFER_BIT);
+
+        gl::setViewMatrix(viewMat);
+        gl::setProjectionMatrix(projMat);
+
+        portal.draw();
+
+        glm::mat4 destView = Portal::getNewViewMatrix(viewMat, portal.getModelMatrix(), portal.getLinkedPortal()->getModelMatrix());
+
+        if (recursiveLevel == maxRecuesiveLevel) {
+            gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            gl::enableDepthWrite();
+            gl::enableDepthRead();
+            gl::clear(GL_DEPTH_BUFFER_BIT);
+
+            gl::enableStencilTest();
+            gl::stencilMask(0x00);
+            gl::stencilFunc(GL_EQUAL, recursiveLevel + 1, 0xFF);
+
+            drawNonPortal(destView, projMat);
+        } else {
+            drawPortalRecursive(destView, projMat, maxRecuesiveLevel, recursiveLevel + 1);
+        }
+
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::disableDepthWrite();
+
+        gl::enableStencilTest();
+        gl::stencilMask(0xFF);
+        gl::stencilFunc(GL_NOTEQUAL, recursiveLevel + 1, 0xFF);
+        gl::stencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+
+        gl::setViewMatrix(viewMat);
+        gl::setProjectionMatrix(projMat);
+
+        portal.draw();
+    }
+
+    gl::disableStencilTest();
+    gl::stencilMask(0xFF);
+
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+    gl::enableDepthRead();
+    gl::enableDepthWrite();
+
+    gl::clear(GL_DEPTH_BUFFER_BIT);
+
+    gl::setViewMatrix(viewMat);
+    gl::setProjectionMatrix(projMat);
+
+    for (auto& portal : mPortals) {
+        portal.draw();
+    }
+
+    gl::enableStencilTest();
+    gl::stencilMask(0x00);
+
+    gl::stencilFunc(GL_LEQUAL, recursiveLevel, 0xFF);
+
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    gl::enableDepthWrite();
+    gl::enableDepthRead();
+
+    drawNonPortal(viewMat, projMat);
+
+    gl::popMatrices();
+}
+
 void SceneTunnelPortal::draw()
 {
     gl::clear(Color::gray(0.2f));
     gl::enableDepthWrite();
     gl::enableDepthRead();
     gl::setMatrices(mCam);
-
-    gl::enableStencilTest();
-    for (auto& portal : mPortals) {
-        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        gl::depthMask(GL_FALSE);
-        gl::stencilFunc(GL_NEVER, 0, 0xFF);
-        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
-        gl::clear(GL_STENCIL_BUFFER_BIT);
-
-        portal.draw();
-
-        gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        gl::depthMask(GL_TRUE);
-        gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
-        gl::pushViewMatrix();
-
-        mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), portal.getModelMatrix(), portal.getLinkedPortal()->getModelMatrix());
-        gl::setViewMatrix(newView);
-        drawSceneObjects();
-        gl::popViewMatrix();
-    }
-    gl::disableStencilTest();
-
-    gl::clear(GL_DEPTH_BUFFER_BIT);
-    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    gl::setMatrices(mCam);
-    for (auto& portal : mPortals)
-        portal.draw();
-    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-    drawSceneObjects();
+    size_t maxRecursiveLevel = 1;
+    drawPortalRecursive(mCam.getViewMatrix(), mCam.getProjectionMatrix(), maxRecursiveLevel, 0);
 }
+
+// void SceneTunnelPortal::draw()
+// {
+//     gl::clear(Color::gray(0.2f));
+//     gl::enableDepthWrite();
+//     gl::enableDepthRead();
+//     gl::setMatrices(mCam);
+
+//     gl::enableStencilTest();
+//     for (auto& portal : mPortals) {
+//         gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+//         gl::depthMask(GL_FALSE);
+//         gl::stencilFunc(GL_NEVER, 0, 0xFF);
+//         gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+//         gl::clear(GL_STENCIL_BUFFER_BIT);
+
+//         portal.draw();
+
+//         gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+//         gl::depthMask(GL_TRUE);
+//         gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+//         gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+//         gl::pushViewMatrix();
+
+//         mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), portal.getModelMatrix(), portal.getLinkedPortal()->getModelMatrix());
+//         gl::setViewMatrix(newView);
+//         drawSceneObjects();
+//         gl::popViewMatrix();
+//     }
+//     gl::disableStencilTest();
+
+//     gl::clear(GL_DEPTH_BUFFER_BIT);
+//     gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+//     gl::setMatrices(mCam);
+//     for (auto& portal : mPortals)
+//         portal.draw();
+//     gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+//     drawSceneObjects();
+// }
 
 void SceneTunnelPortal::drawSceneObjects()
 {

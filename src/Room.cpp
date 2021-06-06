@@ -16,7 +16,7 @@ void Room::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
     auto fmt = gl::Texture::Format();
     fmt.setWrap(GL_REPEAT, GL_REPEAT);
     fmt.enableMipmapping(GL_TRUE);
-    auto floor = geom::Plane().size({mRoomSize.x , mRoomSize.z})
+    auto floor = geom::Plane().size({ mRoomSize.x, mRoomSize.z })
         >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
         >> geom::Translate(mRoomOrigin);
 
@@ -36,22 +36,26 @@ void Room::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
     mWallPositions.push_back({ 0, mRoomSize.y / 2, -mRoomSize.z / 2 + mWallThickness / 2 });
 
     auto wall = geom::Cube();
-    mWalls.push_back(gl::Batch::create(wall.size({ mWallThickness, mRoomSize.y, mRoomSize.z * 4 / 5 }) 
-        >> geom::Translate(mWallPositions[0] + vec3(0, 0, mRoomSize.z / 5 / 2)) 
-        >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0)) 
-        >> geom::Translate(mRoomOrigin), mWallShader));
-    mWalls.push_back(gl::Batch::create(wall.size({ mWallThickness, mRoomSize.y, mRoomSize.z }) 
-        >> geom::Translate(mWallPositions[1]) 
-        >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0)) 
-        >> geom::Translate(mRoomOrigin), mWallShader));
-    mWalls.push_back(gl::Batch::create(wall.size({ mRoomSize.x * 4 / 5, mRoomSize.y, mWallThickness }) 
-        >> geom::Translate(mWallPositions[2] + vec3(mRoomSize.x / 5 / 2, 0, 0)) 
-        >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
-        >> geom::Translate(mRoomOrigin), mWallShader));
-    mWalls.push_back(gl::Batch::create(wall.size({ mRoomSize.x, mRoomSize.y, mWallThickness }) 
-        >> geom::Translate(mWallPositions[3]) 
-        >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0)) 
-        >> geom::Translate(mRoomOrigin), mWallShader));
+    mWalls.push_back(gl::Batch::create(wall.size({ mWallThickness, mRoomSize.y, mRoomSize.z * 4 / 5 })
+            >> geom::Translate(mWallPositions[0] + vec3(0, 0, mRoomSize.z / 5 / 2))
+            >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
+            >> geom::Translate(mRoomOrigin),
+        mWallShader));
+    mWalls.push_back(gl::Batch::create(wall.size({ mWallThickness, mRoomSize.y, mRoomSize.z })
+            >> geom::Translate(mWallPositions[1])
+            >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
+            >> geom::Translate(mRoomOrigin),
+        mWallShader));
+    mWalls.push_back(gl::Batch::create(wall.size({ mRoomSize.x * 4 / 5, mRoomSize.y, mWallThickness })
+            >> geom::Translate(mWallPositions[2] + vec3(mRoomSize.x / 5 / 2, 0, 0))
+            >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
+            >> geom::Translate(mRoomOrigin),
+        mWallShader));
+    mWalls.push_back(gl::Batch::create(wall.size({ mRoomSize.x, mRoomSize.y, mWallThickness })
+            >> geom::Translate(mWallPositions[3])
+            >> geom::Rotate(glm::radians(mRotDeg), vec3(0, 1, 0))
+            >> geom::Translate(mRoomOrigin),
+        mWallShader));
     // ! DO NOT SHUFFLE THIS ORDER
 }
 
