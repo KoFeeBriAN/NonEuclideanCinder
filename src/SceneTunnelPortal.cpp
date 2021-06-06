@@ -31,7 +31,7 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     // setup floor
     auto floor = geom::Plane().size(vec2(100));
     mFloorBatch = gl::Batch::create(floor, textureGlsl);
-    auto imgFloor = geom::Plane().size(vec2(100, 600)).origin(vec3(0, -30.001f, 0));
+    auto imgFloor = geom::Plane().size(vec2(100, 300)).origin(vec3(0, -30.001f, 0));
     mImgFloorBatch = gl::Batch::create(imgFloor, textureGlsl);
 
     // setup tunnel
@@ -59,18 +59,18 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     // setup portal
     mPortals.emplace_back(mCam, mShortTunnel.mPosition, Portal::Z);
     mPortals.emplace_back(mCam, mImgShortTunnel.mPosition, Portal::NEG_Z);
-    // mPortals.emplace_back(
-    //     mCam,
-    //     mImgShortTunnel.mPosition + (float)mImgShortTunnel.mCount * vec3(0, 0, mImgShortTunnel.mLong),
-    //     Portal::Z);
-    // mPortals.emplace_back(
-    //     mCam,
-    //     mShortTunnel.mPosition + (float)mShortTunnel.mCount * vec3(0, 0, mShortTunnel.mLong),
-    //     Portal::NEG_Z);
+    mPortals.emplace_back(
+        mCam,
+        mImgShortTunnel.mPosition + (float)mImgShortTunnel.mCount * vec3(0, 0, -mImgShortTunnel.mLong),
+        Portal::Z);
+    mPortals.emplace_back(
+        mCam,
+        mShortTunnel.mPosition + (float)mShortTunnel.mCount * vec3(0, 0, -mShortTunnel.mLong),
+        Portal::NEG_Z);
     mPortals[0].setLinkedPortal(mPortals[1]);
     mPortals[1].setLinkedPortal(mPortals[0]);
-    // mPortals[2].setLinkedPortal(mPortals[3]);
-    // mPortals[3].setLinkedPortal(mPortals[2]);
+    mPortals[2].setLinkedPortal(mPortals[3]);
+    mPortals[3].setLinkedPortal(mPortals[2]);
     for (auto& portal : mPortals) {
         portal.setSize(vec2(6, 4.5));
         portal.setup();
