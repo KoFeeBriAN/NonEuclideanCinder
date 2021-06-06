@@ -42,4 +42,5 @@ public:
     vec3 getTarget() const;
 
     void setViewMatrix(mat4 viewMat);
+    void setMoveSpeed(float speed);
 };

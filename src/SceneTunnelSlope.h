@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Portal.h"
 #include <vector>
 
 #include "CameraFP.h"
@@ -15,12 +16,15 @@ private:
     gl::TextureRef mFloorTex;
     gl::TextureRef mTunnelTex;
     gl::GlslProgRef mTexGlsl;
-    gl::BatchRef mFloorBatch1, mFloorBatch2, mFloorBatch3;
-    std::vector<gl::BatchRef> mTunnelBatches;
+    gl::BatchRef mFloorBatch11, mFloorBatch12, mFloorBatch21, mFloorBatch22, mFloorBatch31, mFloorBatch32;
+    std::vector<gl::BatchRef> mTunnelBatches1;
+    std::vector<gl::BatchRef> mTunnelBatches2;
+    std::vector<Portal*> mPortals;
 
     // Camera attributes
     ivec2 lastPos;
     ivec2 currentPos;
+    vec3 mLastCamPos;
 
     double mlastTime;
     double mTimeOffset;

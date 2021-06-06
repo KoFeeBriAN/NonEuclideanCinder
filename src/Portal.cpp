@@ -157,8 +157,8 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
                        vec3(p[i + 2].x - p[i].x, p[i + 2].y - p[i].y, p[i + 2].z - p[i].z)))
             * vec3(la.x - p[i].x, la.y - p[i].y, la.z - p[i].z);
         float t = tuv.x, u = tuv.y, v = tuv.z;
-        if (t >= 0 - 3e-1 && t <= 1 + 3e-1) {
-            if (u >= 0 - 3e-1 && u <= 1 + 3e-1 && v >= 0 - 3e-1 && v <= 1 + 3e-1 && (u + v) <= 1 + 3e-1)
+        if (t >= 0 - 1e-1 && t <= 1 + 1e-1) {
+            if (u >= 0 - 1e-1 && u <= 1 + 1e-1 && v >= 0 - 1e-1 && v <= 1 + 1e-1 && (u + v) <= 1 + 1e-1)
                 return 1;
         }
     }
@@ -167,7 +167,7 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 
 void Portal::warp(CameraFP& camera)
 {
-    float offset = 1.0f;
+    float offset = .3f;
     vec3 destPos = mLinkedPortal->mOrigin;
     vec3 destNorm = mLinkedPortal->mNormal;
 
@@ -179,8 +179,10 @@ void Portal::warp(CameraFP& camera)
     CI_LOG_D(sign);
 
     vec3 v = mOrigin - camera.getEyePoint();
-    if (sign)
+    if (sign != 0)
         v = vec3(v.z, v.y, v.x);
+    else if (angle == 0)
+        v = vec3(-v.x, v.y, -v.z);
 
     // Update Camera Position
     // CI_LOG_D("mOrigin");
