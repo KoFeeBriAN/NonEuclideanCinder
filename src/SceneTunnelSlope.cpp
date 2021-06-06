@@ -80,11 +80,25 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     mTunnelBatches2.push_back(gl::Batch::create(m23, mTexGlsl));
 
     // Initialize portals
-    mPortals.push_back(new Portal(mCam, vec3(15.998, 5, 0), Portal::NORMAL_DIR::X));
-    //mPortals.push_back(new Portal(mCam, vec3(2 * slopeXPos + slopeXPosCompensation * 2, 2 * slopeYPos + 5, 0), Portal::NORMAL_DIR::X));
-    mPortals.push_back(new Portal(mCam, vec3(15.998, slopeYPos + 64 - 1.1225, 0), Portal::NORMAL_DIR::X));
-    //mPortals.push_back(new Portal(mCam, vec3(12, 5, 0), Portal::NORMAL_DIR::X));
+    mPortals.push_back(new Portal(mCam));
+    mPortals.push_back(new Portal(mCam));
+    mPortals[0]->setOrigin(vec3(15.998, 3, 0));
+    mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
 
+    mPortals[1]->setOrigin(vec3(15.998, slopeYPos + 64 - 3.1225, 0));
+    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::X);
+    mPortals[0]->setSize(vec2(6, 6));
+    mPortals[1]->setSize(vec2(6, 6));
+    /*
+    auto portal11 = new Portal(mCam, vec3(15.998, 3, 0), Portal::NORMAL_DIR::NEG_X);
+    auto portal12 = new Portal(mCam, vec3(15.998, slopeYPos + 64 - 3.1225, 0), Portal::NORMAL_DIR::X);
+    portal11->setSize(vec2(6, 6));
+    portal12->setSize(vec2(6, 6));
+    mPortals.push_back(portal11);
+    //mPortals.push_back(new Portal(mCam, vec3(2 * slopeXPos + slopeXPosCompensation * 2, 2 * slopeYPos + 5, 0), Portal::NORMAL_DIR::X));
+    mPortals.push_back(portal12);
+    //mPortals.push_back(new Portal(mCam, vec3(12, 5, 0), Portal::NORMAL_DIR::X));
+    */
     // Linked Portals
     mPortals[0]->setLinkedPortal(*mPortals[1]);
     mPortals[1]->setLinkedPortal(*mPortals[0]);
