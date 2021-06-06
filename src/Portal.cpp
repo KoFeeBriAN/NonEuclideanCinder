@@ -21,7 +21,7 @@ Portal::Portal(const CameraFP& playerCam, const vec3& origin, const NORMAL_DIR& 
 void Portal::setup()
 {
     // Initialize Camera
-    auto plane = geom::Plane();
+    auto plane = geom::Plane().size(mSize);
 
     auto shader = gl::getStockShader(gl::ShaderDef().color());
 
@@ -122,22 +122,22 @@ void Portal::updateModelMatrix()
     case NORMAL_DIR::X:
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(-90.0f), vec3(0, 0, 1));
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(180.0f), vec3(0, 1, 0));
-        mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
+        // mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::NEG_X:
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 0, 1));
-        mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
+        // mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::Z:
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 1, 0));
-        mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
+        // mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::NEG_Z:
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(1, 0, 0));
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 1, 0));
         mModelMatrix = glm::rotate(mModelMatrix, glm::radians(180.0f), vec3(1, 0, 0));
-        mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
+        // mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::Y:
     default:
@@ -162,8 +162,8 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
                        vec3(p[i + 2].x - p[i].x, p[i + 2].y - p[i].y, p[i + 2].z - p[i].z)))
             * vec3(la.x - p[i].x, la.y - p[i].y, la.z - p[i].z);
         float t = tuv.x, u = tuv.y, v = tuv.z;
-        if (t >= 0 - 1e-1 && t <= 1 + 1e-1) {
-            if (u >= 0 - 1e-1 && u <= 1 + 1e-1 && v >= 0 - 1e-1 && v <= 1 + 1e-1 && (u + v) <= 1 + 1e-1)
+        if (t >= 0 - 3e-1 && t <= 1 + 3e-1) {
+            if (u >= 0 - 3e-1 && u <= 1 + 3e-1 && v >= 0 - 3e-1 && v <= 1 + 3e-1 && (u + v) <= 1 + 3e-1)
                 return 1;
         }
     }
@@ -172,19 +172,35 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 
 void Portal::warp(CameraFP& camera)
 {
-    float offset = 10.0f;
+    float offset = .6f;
     vec3 destPos = mLinkedPortal->mOrigin;
     vec3 destNorm = mLinkedPortal->mNormal;
 
-    // Update Camera Position
-    camera.setEyePoint(destPos + offset * destNorm);
-
     // Update Camera View
     float angle = glm::acos(glm::dot(mNormal, destNorm));
-    CI_LOG_D(angle);
-    vec3 newDir = glm::rotate(camera.getViewDirection(), -(angle), vec3(0, 1, 0));
-    CI_LOG_D(newDir);
+    float sign = glm::cross(mNormal, destNorm).y;
 
+    vec3 v = mOrigin - camera.getEyePoint();
+    if (sign) v = vec3(v.z, v.y, v.x);
+
+    // Update Camera Position
+    // CI_LOG_D("mOrigin");
+    // CI_LOG_D(mOrigin);
+    // CI_LOG_D("destPos");
+    // CI_LOG_D(destPos);
+    // CI_LOG_D("curPos Prev");
+    // CI_LOG_D(camera.getEyePoint());
+    // CI_LOG_D("v1 destPos - mOrigin");
+    // CI_LOG_D(v1);
+    // CI_LOG_D("v mOrigin - curPos Prev");
+    // CI_LOG_D(v);
+    
+    camera.setEyePoint(destPos - v + offset * destNorm);
+
+    // CI_LOG_D("curPos Now");
+    // CI_LOG_D(camera.getEyePoint());
+
+    vec3 newDir = glm::rotate(camera.getViewDirection(), sign < 0 ? angle : -angle, vec3(0, 1, 0));
     camera.lookAt(camera.getEyePoint() + newDir);
 
     updateModelMatrix();
