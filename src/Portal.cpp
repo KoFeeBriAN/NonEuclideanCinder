@@ -10,7 +10,6 @@ using namespace ci;
 
 Portal::Portal(const CameraFP& playerCam, const vec3& origin, const NORMAL_DIR& dir)
 {
-    mPortalCamera = new CameraFP(playerCam);
     mPlayerCamera = &playerCam;
     setOrigin(origin);
     setNormalDirection(dir);
@@ -56,22 +55,22 @@ void Portal::setNormalDirection(Portal::NORMAL_DIR dir)
 {
     mNormDir = dir;
     switch (mNormDir) {
-        case NORMAL_DIR::X:
-            mNormal = vec3(1, 0, 0);
-            break;
-        case NORMAL_DIR::NEG_X:
-            mNormal = vec3(-1, 0, 0);
-            break;
-        case NORMAL_DIR::Z:
-            mNormal = vec3(0, 0, 1);
-            break;
-        case NORMAL_DIR::NEG_Z:
-            mNormal = vec3(0, 0, -1);
-            break;
-        // !not implement Y so do not use it!!!
-        case NORMAL_DIR::Y:
-        default:
-            mNormal = vec3(1, 0, 0);
+    case NORMAL_DIR::X:
+        mNormal = vec3(1, 0, 0);
+        break;
+    case NORMAL_DIR::NEG_X:
+        mNormal = vec3(-1, 0, 0);
+        break;
+    case NORMAL_DIR::Z:
+        mNormal = vec3(0, 0, 1);
+        break;
+    case NORMAL_DIR::NEG_Z:
+        mNormal = vec3(0, 0, -1);
+        break;
+    // !not implement Y so do not use it!!!
+    case NORMAL_DIR::Y:
+    default:
+        mNormal = vec3(1, 0, 0);
     }
     mRight = glm::normalize(::cross(mNormal, vec3(0, 1, 0))); // ERR when mNormal == vec3(0, 1, 0);
     mUp = glm::normalize(glm::cross(mRight, mNormal));
@@ -92,15 +91,10 @@ void Portal::setOrigin(vec3 origin)
 
 mat4 Portal::getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel)
 {
-    return curView * curModel 
-            * glm::rotate(mat4(1.0), glm::radians(180.0f), vec3(0, 1, 0)) 
-            * glm::rotate(mat4(1.0), glm::radians(180.0f), vec3(0, 0, 1)) 
-            * glm::inverse(dstModel);
-}
-
-CameraFP* Portal::getPortalCamera()
-{
-    return mPortalCamera;
+    return curView * curModel
+        * glm::rotate(mat4(1.0), glm::radians(180.0f), vec3(0, 1, 0))
+        * glm::rotate(mat4(1.0), glm::radians(180.0f), vec3(0, 0, 1))
+        * glm::inverse(dstModel);
 }
 
 mat4 Portal::getModelMatrix() const
@@ -143,17 +137,18 @@ void Portal::updateModelMatrix()
     default:
         break;
     }
-
 }
 
 bool Portal::isIntersect(const vec3& la, const vec3& lb)
 {
     if (la == lb)
         return 0;
-    vec4 p[4] = { vec4(mOrigin + mSize.x * mUp - mSize.y * mRight, 1.0),
-        vec4(mOrigin + mSize.x * mUp + mSize.y * mRight, 1.0),
-        vec4(mOrigin - mSize.x * mUp - mSize.y * mRight, 1.0),
-        vec4(mOrigin - mSize.x * mUp + mSize.y * mRight, 1.0) };
+    if (glm::dot((lb - la), mNormal) > 0)
+        return 0;
+    vec4 p[4] = { vec4(mOrigin + mSize.x / 2 * mUp - mSize.y / 2 * mRight, 1.0),
+        vec4(mOrigin + mSize.x / 2 * mUp + mSize.y / 2 * mRight, 1.0),
+        vec4(mOrigin - mSize.x / 2 * mUp - mSize.y / 2 * mRight, 1.0),
+        vec4(mOrigin - mSize.x / 2 * mUp + mSize.y / 2 * mRight, 1.0) };
     // check intersection
     for (int i = 0; i < 2; ++i) {
         vec3 tuv = glm::inverse(glm::mat3(
@@ -172,13 +167,16 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 
 void Portal::warp(CameraFP& camera)
 {
-    float offset = .6f;
+    float offset = 1.0f;
     vec3 destPos = mLinkedPortal->mOrigin;
     vec3 destNorm = mLinkedPortal->mNormal;
 
     // Update Camera View
     float angle = glm::acos(glm::dot(mNormal, destNorm));
     float sign = glm::cross(mNormal, destNorm).y;
+
+    CI_LOG_D(angle);
+    CI_LOG_D(sign);
 
     vec3 v = mOrigin - camera.getEyePoint();
     if (sign) v = vec3(v.z, v.y, v.x);
@@ -194,13 +192,13 @@ void Portal::warp(CameraFP& camera)
     // CI_LOG_D(v1);
     // CI_LOG_D("v mOrigin - curPos Prev");
     // CI_LOG_D(v);
-    
+
     camera.setEyePoint(destPos - v + offset * destNorm);
 
     // CI_LOG_D("curPos Now");
     // CI_LOG_D(camera.getEyePoint());
 
-    vec3 newDir = glm::rotate(camera.getViewDirection(), sign < 0 ? angle : -angle, vec3(0, 1, 0));
+    vec3 newDir = glm::rotate(camera.getViewDirection(), sign <= 0 ? glm::pi<float>() - angle : -angle, vec3(0, 1, 0));
     camera.lookAt(camera.getEyePoint() + newDir);
 
     updateModelMatrix();

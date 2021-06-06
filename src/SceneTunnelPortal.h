@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Portal.h"
 #include "Scene.h"
 #include "Tunnel.h"
 #include <vector>
@@ -10,7 +11,7 @@
 
 using namespace ci;
 
-class SceneTunnel : public Scene {
+class SceneTunnelPortal : public Scene {
 private:
     CameraFP mCam;
     gl::TextureRef mFloorTex;
@@ -18,11 +19,17 @@ private:
     gl::TextureCubeMapRef mSkyboxTex;
     gl::GlslProgRef mColorGlsl;
     gl::BatchRef mFloorBatch;
+    gl::BatchRef mImgFloorBatch;
     gl::BatchRef mSkyboxBatch;
+
+    // Portals
+    std::vector<Portal> mPortals;
 
     //Tunnel
     Tunnel mShortTunnel;
     Tunnel mLongTunnel;
+    Tunnel mImgShortTunnel;
+    Tunnel mImgLongTunnel;
 
     // Camera attributes
     ivec2 lastPos;
@@ -33,13 +40,15 @@ private:
     bool firstMouseMove = true;
 
 public:
-    ~SceneTunnel() = default;
+    ~SceneTunnelPortal() = default;
     void setup(const std::unordered_map<std::string, DataSourceRef>& assets) override;
     void update(double currentTime) override;
     void draw() override;
     Camera* getCamera() override;
     void handleMouseMove(MouseEvent event) override;
     void handleKeyDown(KeyEvent event) override;
+
+    void drawSceneObjects();
 
 private:
     void processInput();

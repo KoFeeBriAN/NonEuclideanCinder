@@ -10,6 +10,14 @@
 
 using namespace ci;
 
+SceneRoom::~SceneRoom()
+{
+    for (auto room : mRooms)
+        delete room;
+    for (auto portal : mPortals)
+        delete portal;
+}
+
 void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
     gl::enableDepthWrite();
@@ -21,9 +29,9 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // Initialize camera properties
-    
+
     mCam.setEyePoint({ 0, 5, -5 }); // set camera position
-    mLastCamPos = mCam.getEyePoint(); 
+    mLastCamPos = mCam.getEyePoint();
 
     mCam.lookAt({ 0, 0, -1 }); // set view direction
     mCam.toggleFloating();
@@ -48,9 +56,9 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_Z);
 
     mPortals[1]->setOrigin(vec3(0 + 50 + 0.1, 10, 100 + 50 - 10));
-    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
-    mPortals[0]->setSize({20, 20});
-    mPortals[1]->setSize({20, 20});
+    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::Z);
+    mPortals[0]->setSize({ 20, 20 });
+    mPortals[1]->setSize({ 20, 20 });
 
     // Linked Portals
     mPortals[0]->setLinkedPortal(*mPortals[1]);
@@ -104,7 +112,6 @@ void SceneRoom::update(double currentTime)
 
     // Update Last Position
     mLastCamPos = mCam.getEyePoint();
-    
 }
 
 void SceneRoom::draw()
@@ -113,7 +120,6 @@ void SceneRoom::draw()
     gl::clear(Color::gray(0.2f));
     gl::setMatrices(mCam); // set matrix scene to match the camera
 
-    
     gl::enableStencilTest();
 
     for (auto& portal : mPortals) {
@@ -122,7 +128,7 @@ void SceneRoom::draw()
         gl::stencilFunc(GL_NEVER, 0, 0xFF);
         gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
         gl::clear(GL_STENCIL_BUFFER_BIT);
-        
+
         portal->draw();
 
         gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -151,7 +157,7 @@ void SceneRoom::draw()
 
     for (auto room : mRooms)
         room->draw();
-    
+
     mObject->draw();
     mObject2->draw();
 }
