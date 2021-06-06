@@ -19,7 +19,8 @@ private:
     gl::TextureCubeMapRef mSkyboxTex;
     gl::GlslProgRef mColorGlsl;
     gl::BatchRef mFloorBatch;
-    gl::BatchRef mImgFloorBatch;
+    gl::BatchRef mFloor2Batch;
+    gl::BatchRef mFloor3Batch;
     gl::BatchRef mSkyboxBatch;
 
     // Portals
@@ -51,6 +52,8 @@ public:
     void handleKeyDown(KeyEvent event) override;
 
     void drawSceneObjects();
+
+    void drawPortalImages();
 
 private:
     void processInput();

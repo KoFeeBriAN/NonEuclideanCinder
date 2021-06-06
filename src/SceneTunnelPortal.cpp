@@ -31,8 +31,10 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     // setup floor
     auto floor = geom::Plane().size(vec2(100));
     mFloorBatch = gl::Batch::create(floor, textureGlsl);
-    auto imgFloor = geom::Plane().size(vec2(100, 300)).origin(vec3(0, -30.001f, 0));
-    mImgFloorBatch = gl::Batch::create(imgFloor, textureGlsl);
+    auto floor2 = geom::Plane().size(vec2(100, 300)).origin(vec3(0, -30.001f, 0));
+    mFloor2Batch = gl::Batch::create(floor2, textureGlsl);
+    auto floor3 = geom::Plane().size(vec2(100, 100.0 / 3.0)).origin(vec3(0, -100.0f, 0));
+    mFloor3Batch = gl::Batch::create(floor3, textureGlsl);
 
     // setup tunnel
     mShortTunnel.setCount(1);
@@ -52,11 +54,11 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     mImgShortTunnel.setupTunnel();
 
     mImgLongTunnel.setCount(1);
-    mImgLongTunnel.setPosition(vec3(10, -27, -5));
+    mImgLongTunnel.setPosition(vec3(10, -97, -5));
     mImgLongTunnel.setTexture(mTunnelTex);
     mImgLongTunnel.setupTunnel();
 
-    // setup portal
+    // setup portals of short tunnels
     mPortals.emplace_back(mCam, mShortTunnel.mPosition, Portal::Z);
     mPortals.emplace_back(mCam, mImgShortTunnel.mPosition, Portal::NEG_Z);
     mPortals.emplace_back(
@@ -67,10 +69,27 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
         mCam,
         mShortTunnel.mPosition + (float)mShortTunnel.mCount * vec3(0, 0, -mShortTunnel.mLong),
         Portal::NEG_Z);
-    mPortals[0].setLinkedPortal(mPortals[1]);
-    mPortals[1].setLinkedPortal(mPortals[0]);
-    mPortals[2].setLinkedPortal(mPortals[3]);
-    mPortals[3].setLinkedPortal(mPortals[2]);
+
+    // setup portal of long tunnels
+    mPortals.emplace_back(mCam, mLongTunnel.mPosition, Portal::Z);
+    mPortals.emplace_back(mCam, mImgLongTunnel.mPosition, Portal::NEG_Z);
+    mPortals.emplace_back(
+        mCam,
+        mImgLongTunnel.mPosition + (float)mImgLongTunnel.mCount * vec3(0, 0, -mImgLongTunnel.mLong),
+        Portal::Z);
+    mPortals.emplace_back(
+        mCam,
+        mLongTunnel.mPosition + (float)mLongTunnel.mCount * vec3(0, 0, -mLongTunnel.mLong),
+        Portal::NEG_Z);
+
+    for (int i = 0; i < mPortals.size() - 1; i += 2) {
+        mPortals[i].setLinkedPortal(mPortals[i + 1]);
+        mPortals[i + 1].setLinkedPortal(mPortals[i]);
+    }
+    // mPortals[0].setLinkedPortal(mPortals[1]);
+    // mPortals[1].setLinkedPortal(mPortals[0]);
+    // mPortals[2].setLinkedPortal(mPortals[3]);
+    // mPortals[3].setLinkedPortal(mPortals[2]);
     for (auto& portal : mPortals) {
         portal.setSize(vec2(6, 4.5));
         portal.setup();
@@ -173,16 +192,47 @@ void SceneTunnelPortal::drawSceneObjects()
     // draw floor
     mFloorTex->bind();
     mFloorBatch->draw();
+    mFloor2Batch->draw();
+    mFloor3Batch->draw();
 
     // draw new Tunnel
     mShortTunnel.draw();
     mLongTunnel.draw();
 
     // draw iluution scene
-    mFloorTex->bind();
-    mImgFloorBatch->draw();
     mImgShortTunnel.draw();
     mImgLongTunnel.draw();
+}
+
+void SceneTunnelPortal::drawPortalImages()
+{
+    gl::enableStencilTest();
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::depthMask(GL_FALSE);
+    gl::stencilFunc(GL_NEVER, 0, 0xFF);
+    gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+    gl::clear(GL_STENCIL_BUFFER_BIT);
+    mPortals[0].draw();
+    for (int i = 1; i < mPortals.size() - 1; i++) {
+        gl::stencilFunc(GL_EQUAL, 0, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        mPortals[i].draw();
+
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::stencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+        mPortals[i - 1].draw();
+    }
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    gl::depthMask(GL_TRUE);
+    gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+    gl::pushViewMatrix();
+
+    mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), mPortals.back().getModelMatrix(), mPortals.back().getLinkedPortal()->getModelMatrix());
+    gl::setViewMatrix(newView);
+    drawSceneObjects();
+    gl::popViewMatrix();
+    gl::disableStencilTest();
 }
 
 Camera*
