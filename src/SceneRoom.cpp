@@ -31,6 +31,7 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     // Initialize camera properties
 
     mCam.setEyePoint({ 0, 5, -5 }); // set camera position
+    mCam.setMoveSpeed(25.0);
     mLastCamPos = mCam.getEyePoint();
 
     mCam.lookAt({ 0, 0, -1 }); // set view direction
@@ -56,7 +57,7 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_Z);
 
     mPortals[1]->setOrigin(vec3(0 + 50 + 0.1, 10, 100 + 50 - 10));
-    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::Z);
+    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
     mPortals[0]->setSize({ 20, 20 });
     mPortals[1]->setSize({ 20, 20 });
 

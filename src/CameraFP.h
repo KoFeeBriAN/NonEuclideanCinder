@@ -21,7 +21,7 @@ protected:
     vec3 mTarget;
     float mPitch = 0;
     float mYaw = -90;
-    float mMoveSpeed = 25;
+    float mMoveSpeed = 10;
     bool mFrozen = false;
     bool mHidden = false;
     bool mFloating = true;
@@ -42,4 +42,5 @@ public:
     vec3 getTarget() const;
 
     void setViewMatrix(mat4 viewMat);
+    void setMoveSpeed(float speed);
 };

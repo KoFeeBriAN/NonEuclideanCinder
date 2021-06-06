@@ -127,3 +127,8 @@ void CameraFP::setViewMatrix(mat4 viewMat)
     mViewMatrix = viewMat;
     calcViewMatrix();
 }
+
+void CameraFP::setMoveSpeed(float speed)
+{
+    mMoveSpeed = speed;
+}
