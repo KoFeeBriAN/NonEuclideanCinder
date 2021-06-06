@@ -53,6 +53,8 @@ public:
 
     void drawSceneObjects();
 
+    void drawPortalImages();
+
 private:
     void processInput();
 };

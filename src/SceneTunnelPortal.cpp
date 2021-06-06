@@ -204,6 +204,37 @@ void SceneTunnelPortal::drawSceneObjects()
     mImgLongTunnel.draw();
 }
 
+void SceneTunnelPortal::drawPortalImages()
+{
+    gl::enableStencilTest();
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::depthMask(GL_FALSE);
+    gl::stencilFunc(GL_NEVER, 0, 0xFF);
+    gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+    gl::clear(GL_STENCIL_BUFFER_BIT);
+    mPortals[0].draw();
+    for (int i = 1; i < mPortals.size() - 1; i++) {
+        gl::stencilFunc(GL_EQUAL, 0, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        mPortals[i].draw();
+
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::stencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+        mPortals[i - 1].draw();
+    }
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    gl::depthMask(GL_TRUE);
+    gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+    gl::pushViewMatrix();
+
+    mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), mPortals.back().getModelMatrix(), mPortals.back().getLinkedPortal()->getModelMatrix());
+    gl::setViewMatrix(newView);
+    drawSceneObjects();
+    gl::popViewMatrix();
+    gl::disableStencilTest();
+}
+
 Camera*
 SceneTunnelPortal::getCamera()
 {
