@@ -143,6 +143,8 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 {
     if (la == lb)
         return 0;
+    if (glm::dot(lb - la, mNormal) > 0.0)
+        return 0;
     vec4 p[4] = { vec4(mOrigin + mSize.x / 2 * mUp - mSize.y / 2 * mRight, 1.0),
         vec4(mOrigin + mSize.x / 2 * mUp + mSize.y / 2 * mRight, 1.0),
         vec4(mOrigin - mSize.x / 2 * mUp - mSize.y / 2 * mRight, 1.0),

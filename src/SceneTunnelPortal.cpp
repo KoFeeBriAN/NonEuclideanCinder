@@ -46,25 +46,33 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     mLongTunnel.setupTunnel();
 
     // setup illution tunnel
-    mImgShortTunnel.setCount(1);
-    mImgShortTunnel.setPosition(vec3(10, -27, -5));
+    mImgShortTunnel.setCount(6);
+    mImgShortTunnel.setPosition(vec3(-10, -27, -5));
     mImgShortTunnel.setTexture(mTunnelTex);
     mImgShortTunnel.setupTunnel();
 
-    mImgLongTunnel.setCount(6);
-    mImgLongTunnel.setPosition(vec3(-10, -27, -5));
+    mImgLongTunnel.setCount(1);
+    mImgLongTunnel.setPosition(vec3(10, -27, -5));
     mImgLongTunnel.setTexture(mTunnelTex);
     mImgLongTunnel.setupTunnel();
 
     // setup portal
-    mPortals.emplace_back(mCam, vec3(-10, 3, -5), Portal::Z);
-    mPortals.emplace_back(mCam, vec3(-10, -27, -5), Portal::Z);
-    mPortals[0].setSize(vec2(6, 4.5));
-    mPortals[1].setSize(vec2(4.5, 6));
+    mPortals.emplace_back(mCam, mShortTunnel.mPosition, Portal::Z);
+    mPortals.emplace_back(mCam, mImgShortTunnel.mPosition, Portal::NEG_Z);
+    // mPortals.emplace_back(
+    //     mCam,
+    //     mImgShortTunnel.mPosition + (float)mImgShortTunnel.mCount * vec3(0, 0, mImgShortTunnel.mLong),
+    //     Portal::Z);
+    // mPortals.emplace_back(
+    //     mCam,
+    //     mShortTunnel.mPosition + (float)mShortTunnel.mCount * vec3(0, 0, mShortTunnel.mLong),
+    //     Portal::NEG_Z);
     mPortals[0].setLinkedPortal(mPortals[1]);
     mPortals[1].setLinkedPortal(mPortals[0]);
+    // mPortals[2].setLinkedPortal(mPortals[3]);
+    // mPortals[3].setLinkedPortal(mPortals[2]);
     for (auto& portal : mPortals) {
-        // portal.setPlayerCamera(mCam);
+        portal.setSize(vec2(6, 4.5));
         portal.setup();
     }
     ImGui::Initialize();
@@ -99,6 +107,19 @@ void SceneTunnelPortal::update(double currentTime)
     mTimeOffset = currentTime - mlastTime;
     mlastTime = currentTime;
 
+    // Portal update
+    for (auto& portal : mPortals)
+        portal.update();
+
+    for (auto& portal : mPortals) {
+        if (portal.isIntersect(mLastCamPos, mCam.getEyePoint())) {
+            portal.warp(mCam);
+            break;
+        }
+    }
+
+    // Update Last Position
+    mLastCamPos = mCam.getEyePoint();
     // Poll for inputs
     processInput();
 }

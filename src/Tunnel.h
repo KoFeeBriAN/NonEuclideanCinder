@@ -19,7 +19,6 @@ public:
     void setPosition(const vec3& position);
     void draw();
 
-private:
     std::vector<gl::BatchRef> mTunnelBatches;
     std::vector<gl::BatchRef> mWallBatches;
     gl::GlslProgRef mGlsl = gl::getStockShader(gl::ShaderDef().texture());
