@@ -13,12 +13,12 @@ using namespace ci;
 class Portal {
 public:
 
-    enum NORMAL_DIR { X, Y, Z };
+    enum NORMAL_DIR { X, Y, Z, NEG_X, NEG_Y, NEG_Z };
 
     static mat4 getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel);
 
     Portal() = delete;
-    Portal(const CameraFP& playerCam, const vec3& origin, const NORMAL_DIR& dir);
+    Portal(const CameraFP& playerCam, const vec3& origin = vec3(), const NORMAL_DIR& dir = NORMAL_DIR::X);
     ~Portal();
     void setup();
     void update();
@@ -26,6 +26,7 @@ public:
 
     void setSize(vec2 size);
     void setOrigin(vec3 origin);
+    void setNormalDirection(NORMAL_DIR dir);
     void setPlayerCamera(const CameraFP& camera);
     void setLinkedPortal(Portal& portal);
     
@@ -37,7 +38,7 @@ public:
     Portal* getLinkedPortal();
 
 protected:
-    vec2 mSize = vec2(5, 3);
+    vec2 mSize = vec2(20, 20);
     vec3 mOrigin;
 
     NORMAL_DIR mNormDir;
