@@ -1,4 +1,4 @@
-#include "SceneTunnel.h"
+#include "SceneTunnelPortal.h"
 
 #include "cinder/CinderImGui.h"
 #include "cinder/gl/Shader.h"
@@ -6,7 +6,7 @@
 
 using namespace ci;
 
-void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
+void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
     // set GLFW
     glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -24,25 +24,49 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     auto skyboxGlsl = gl::GlslProg::create(assets.at("skybox.vert"), assets.at("skybox.frag"));
 
     // setup skybox
-    mSkyboxBatch = gl::Batch::create(geom::Cube().size(vec3(300)), skyboxGlsl);
+    auto skybox = geom::Cube().size(vec3(300));
+    mSkyboxBatch = gl::Batch::create(skybox, skyboxGlsl);
     mSkyboxBatch->getGlslProg()->uniform("uCubeMapTex", 0);
 
     // setup floor
-    mFloorBatch = gl::Batch::create(geom::Plane().size(vec2(100)), textureGlsl);
+    auto floor = geom::Plane().size(vec2(100));
+    mFloorBatch = gl::Batch::create(floor, textureGlsl);
+    auto imgFloor = geom::Plane().size(vec2(100, 600)).origin(vec3(0, -30.001f, 0));
+    mImgFloorBatch = gl::Batch::create(imgFloor, textureGlsl);
 
     // setup tunnel
-    mShortTunnel.setCount(6);
+    mShortTunnel.setCount(1);
     mShortTunnel.setPosition(vec3(-10, 3, -5));
     mShortTunnel.setTexture(mTunnelTex);
     mShortTunnel.setupTunnel();
-    mShortTunnel.setupSideWall();
 
     mLongTunnel.setCount(6);
     mLongTunnel.setPosition(vec3(10, 3, -5));
     mLongTunnel.setTexture(mTunnelTex);
     mLongTunnel.setupTunnel();
-    mLongTunnel.setupFrontWall();
 
+    // setup illution tunnel
+    mImgShortTunnel.setCount(1);
+    mImgShortTunnel.setPosition(vec3(10, -27, -5));
+    mImgShortTunnel.setTexture(mTunnelTex);
+    mImgShortTunnel.setupTunnel();
+
+    mImgLongTunnel.setCount(6);
+    mImgLongTunnel.setPosition(vec3(-10, -27, -5));
+    mImgLongTunnel.setTexture(mTunnelTex);
+    mImgLongTunnel.setupTunnel();
+
+    // setup portal
+    mPortals.emplace_back(mCam, vec3(-10, 3, -5), Portal::Z);
+    mPortals.emplace_back(mCam, vec3(-10, -27, -5), Portal::Z);
+    mPortals[0].setSize(vec2(6, 4.5));
+    mPortals[1].setSize(vec2(4.5, 6));
+    mPortals[0].setLinkedPortal(mPortals[1]);
+    mPortals[1].setLinkedPortal(mPortals[0]);
+    for (auto& portal : mPortals) {
+        // portal.setPlayerCamera(mCam);
+        portal.setup();
+    }
     ImGui::Initialize();
 
     // initialize camera properties
@@ -51,7 +75,7 @@ void SceneTunnel::setup(const std::unordered_map<std::string, DataSourceRef>& as
     mCam.toggleFloating();
 }
 
-void SceneTunnel::update(double currentTime)
+void SceneTunnelPortal::update(double currentTime)
 {
     // Debug UI
     ImGui::Begin("Debug panel");
@@ -79,13 +103,48 @@ void SceneTunnel::update(double currentTime)
     processInput();
 }
 
-void SceneTunnel::draw()
+void SceneTunnelPortal::draw()
 {
     gl::clear(Color::gray(0.2f));
     gl::enableDepthWrite();
     gl::enableDepthRead();
     gl::setMatrices(mCam);
 
+    gl::enableStencilTest();
+    for (auto& portal : mPortals) {
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::depthMask(GL_FALSE);
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        gl::clear(GL_STENCIL_BUFFER_BIT);
+
+        portal.draw();
+
+        gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        gl::depthMask(GL_TRUE);
+        gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+        gl::pushViewMatrix();
+
+        mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), portal.getModelMatrix(), portal.getLinkedPortal()->getModelMatrix());
+        gl::setViewMatrix(newView);
+        drawSceneObjects();
+        gl::popViewMatrix();
+    }
+    gl::disableStencilTest();
+
+    gl::clear(GL_DEPTH_BUFFER_BIT);
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::setMatrices(mCam);
+    for (auto& portal : mPortals)
+        portal.draw();
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    drawSceneObjects();
+}
+
+void SceneTunnelPortal::drawSceneObjects()
+{
     // draw skybox
     mSkyboxTex->bind();
     mSkyboxBatch->draw();
@@ -97,32 +156,29 @@ void SceneTunnel::draw()
     // draw new Tunnel
     mShortTunnel.draw();
     mLongTunnel.draw();
+
+    // draw iluution scene
+    mFloorTex->bind();
+    mImgFloorBatch->draw();
+    mImgShortTunnel.draw();
+    mImgLongTunnel.draw();
 }
 
-Camera* SceneTunnel::getCamera()
+Camera*
+SceneTunnelPortal::getCamera()
 {
     return &mCam;
 }
 
-void SceneTunnel::handleKeyDown(KeyEvent event)
+void SceneTunnelPortal::handleKeyDown(KeyEvent event)
 {
     if (event.getCode() == KeyEvent::KEY_f)
         mCam.toggleFreeze(mGlfwWindowRef);
     if (event.getCode() == KeyEvent::KEY_t)
         mCam.toggleFloating();
-
-    // For testing
-    if (event.getCode() == KeyEvent::KEY_i)
-        mCam.move(MOVEMENT::FORWARD, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_k)
-        mCam.move(MOVEMENT::BACKWARD, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_j)
-        mCam.move(MOVEMENT::LEFT, mTimeOffset);
-    if (event.getCode() == KeyEvent::KEY_l)
-        mCam.move(MOVEMENT::RIGHT, mTimeOffset);
 }
 
-void SceneTunnel::handleMouseMove(MouseEvent event)
+void SceneTunnelPortal::handleMouseMove(MouseEvent event)
 {
     if (firstMouseMove) {
         lastPos = event.getPos();
@@ -136,7 +192,7 @@ void SceneTunnel::handleMouseMove(MouseEvent event)
     mCam.processMouse(offset.x, offset.y);
 }
 
-void SceneTunnel::processInput()
+void SceneTunnelPortal::processInput()
 {
     if (glfwGetKey(mGlfwWindowRef, GLFW_KEY_W) == GLFW_PRESS)
         mCam.move(MOVEMENT::FORWARD, mTimeOffset);

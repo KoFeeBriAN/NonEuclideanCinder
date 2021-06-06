@@ -1,10 +1,11 @@
 #define GLFW_INCLUDE_NONE
 
 #include "Resources.h"
+#include "SceneRoom.h"
 #include "SceneTest.h"
 #include "SceneTest2.h"
-#include "SceneRoom.h"
 #include "SceneTunnel.h"
+#include "SceneTunnelPortal.h"
 #include "SceneTunnelVertical.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
@@ -20,6 +21,7 @@ enum class SCENE {
     TEST2,
     ROOM,
     TUNNEL,
+    TUNNEL_PORTAL,
     TUNNEL_VERTICAL
 };
 
@@ -70,11 +72,13 @@ void MainApp::keyDown(KeyEvent event)
     if (event.getCode() == KeyEvent::KEY_2)
         switchScene(SCENE::TEST2);
     if (event.getCode() == KeyEvent::KEY_3)
-        switchScene(SCENE::ROOM);   // Mutiple Rooms
+        switchScene(SCENE::ROOM); // Mutiple Rooms
     if (event.getCode() == KeyEvent::KEY_4)
         switchScene(SCENE::TUNNEL);
     if (event.getCode() == KeyEvent::KEY_5)
         switchScene(SCENE::TUNNEL_VERTICAL);
+    if (event.getCode() == KeyEvent::KEY_6)
+        switchScene(SCENE::TUNNEL_PORTAL);
 
     currentScene->handleKeyDown(event);
 }
@@ -102,6 +106,9 @@ void MainApp::setup()
     mSources.insert({ "checkerboard.png", loadAsset("checkerboard.png") });
     mSources.insert({ "rock-toon.jpg", loadAsset("rock-toon.jpg") });
     mSources.insert({ "rock-tunnel", loadAsset("cartoon-rock-texture.jpg") });
+    mSources.insert({ "galaxy-texture", loadAsset("galaxy-skybox.png") });
+    mSources.insert({ "skybox.vert", loadAsset("skybox.vert") });
+    mSources.insert({ "skybox.frag", loadAsset("skybox.frag") });
     mSources.insert({ "wood-toon", loadAsset("wood-toon.jpg") });
 
     // Set Window size
@@ -137,9 +144,11 @@ void MainApp::switchScene(SCENE scene)
     case SCENE::ROOM:
         currentScene = new SceneRoom();
         break;
-
     case SCENE::TUNNEL:
         currentScene = new SceneTunnel();
+        break;
+    case SCENE::TUNNEL_PORTAL:
+        currentScene = new SceneTunnelPortal();
         break;
     case SCENE::TUNNEL_VERTICAL:
         currentScene = new SceneTunnelVertical();

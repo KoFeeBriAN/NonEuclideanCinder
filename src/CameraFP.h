@@ -38,8 +38,8 @@ public:
     void toggleHiddenCursor(GLFWwindow* window);
     void toggleFreeze(GLFWwindow* window);
     void toggleFloating();
-    
-    void setViewMatrix(mat4 viewMat);
 
-    vec3 getTarget();
+    vec3 getTarget() const;
+
+    void setViewMatrix(mat4 viewMat);
 };

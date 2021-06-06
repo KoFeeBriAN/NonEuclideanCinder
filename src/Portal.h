@@ -12,14 +12,18 @@ using namespace ci;
 
 class Portal {
 public:
-
-    enum NORMAL_DIR { X, Y, Z, NEG_X, NEG_Y, NEG_Z };
+    enum NORMAL_DIR { X,
+        Y,
+        Z,
+        NEG_X,
+        NEG_Y,
+        NEG_Z };
 
     static mat4 getNewViewMatrix(const mat4& curView, const mat4& curModel, const mat4& dstModel);
 
     Portal() = delete;
     Portal(const CameraFP& playerCam, const vec3& origin = vec3(), const NORMAL_DIR& dir = NORMAL_DIR::X);
-    ~Portal();
+    ~Portal() = default;
     void setup();
     void update();
     void draw();
@@ -29,7 +33,7 @@ public:
     void setNormalDirection(NORMAL_DIR dir);
     void setPlayerCamera(const CameraFP& camera);
     void setLinkedPortal(Portal& portal);
-    
+
     bool isIntersect(const vec3& la, const vec3& lb);
     void warp(CameraFP& camera);
 

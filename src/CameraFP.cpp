@@ -66,7 +66,8 @@ void CameraFP::move(MOVEMENT movement, double timeOffset)
     if (!mFloating)
         mEyePoint.y = currentY;
 
-    lookAt(mEyePoint + mViewDirection);
+    mTarget = mEyePoint + mViewDirection;
+    lookAt(mTarget);
 }
 
 void CameraFP::freeze(GLFWwindow* window)
@@ -116,7 +117,7 @@ void CameraFP::toggleFloating()
     mFloating = !mFloating;
 }
 
-vec3 CameraFP::getTarget()
+vec3 CameraFP::getTarget() const
 {
     return mTarget;
 }
