@@ -75,9 +75,6 @@ void Portal::setNormalDirection(Portal::NORMAL_DIR dir)
     }
     mRight = glm::normalize(::cross(mNormal, vec3(0, 1, 0))); // ERR when mNormal == vec3(0, 1, 0);
     mUp = glm::normalize(glm::cross(mRight, mNormal));
-    CI_LOG_D(mNormal);
-    CI_LOG_D(mRight);
-    CI_LOG_D(mUp);
     updateModelMatrix();
 }
 
@@ -123,12 +120,12 @@ void Portal::updateModelMatrix()
 
     switch (mNormDir) {
     case NORMAL_DIR::X:
-        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 0, 1));
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(-90.0f), vec3(0, 0, 1));
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(180.0f), vec3(0, 1, 0));
         mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::NEG_X:
-        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(-90.0f), vec3(0, 0, 1));
-        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(180.0f), vec3(0, 1, 0));
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(90.0f), vec3(0, 0, 1));
         mModelMatrix = glm::scale(mModelMatrix, vec3(mSize.x / 2, 1.0, mSize.y / 2));
         break;
     case NORMAL_DIR::Z:
@@ -184,9 +181,11 @@ void Portal::warp(CameraFP& camera)
 
     // Update Camera View
     float angle = glm::acos(glm::dot(mNormal, destNorm));
-    vec3 newDir = glm::rotate(camera.getViewDirection(), glm::abs(angle), vec3(0, 1, 0));
+    CI_LOG_D(angle);
+    vec3 newDir = glm::rotate(camera.getViewDirection(), -(angle), vec3(0, 1, 0));
+    CI_LOG_D(newDir);
 
-    camera.lookAt(destPos + newDir);
+    camera.lookAt(camera.getEyePoint() + newDir);
 
     updateModelMatrix();
 }

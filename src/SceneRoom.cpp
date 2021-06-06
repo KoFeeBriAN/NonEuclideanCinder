@@ -46,7 +46,9 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     mPortals.push_back(new Portal(mCam));
     mPortals[0]->setOrigin(vec3(100 + 50 - 10, 10, 0 + 50 + 0.1));
     mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_Z);
+
     mPortals[1]->setOrigin(vec3(0 + 50 + 0.1, 10, 100 + 50 - 10));
+    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
     mPortals[0]->setSize({20, 20});
     mPortals[1]->setSize({20, 20});
 
