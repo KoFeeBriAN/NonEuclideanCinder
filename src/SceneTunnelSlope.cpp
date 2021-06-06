@@ -1,8 +1,8 @@
 #include "SceneTunnelSlope.h"
 #include "Portal.h"
 
-#include "cinder/Log.h"
 #include "cinder/CinderImGui.h"
+#include "cinder/Log.h"
 #include "cinder/gl/Shader.h"
 #include "cinder/gl/wrapper.h"
 
@@ -18,7 +18,7 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     gl::enableDepthWrite();
     gl::enableDepthRead();
 
-    mLastCamPos = mCam.getEyePoint(); 
+    mLastCamPos = mCam.getEyePoint();
 
     // set GLFW
     glfwSetInputMode(mGlfwWindowRef, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -38,8 +38,9 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
 
     auto floorTop1 = geom::Plane().size({ 32, 32 });
     auto floorSlope1 = geom::Plane().size({ 32, 32 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(slopeXPos + slopeXPosCompensation, slopeYPos, 0));
-    auto floorButtom1 = geom::Plane().size({ 32, 32 })  >> geom::Translate(vec3(2 * (slopeXPos + slopeXPosCompensation), 2 * slopeYPos, 0));
-    auto floorTop2 = floorButtom1 >> geom::Translate(vec3(0, 64 - (2 * slopeYPos), 0));;
+    auto floorButtom1 = geom::Plane().size({ 32, 32 }) >> geom::Translate(vec3(2 * (slopeXPos + slopeXPosCompensation), 2 * slopeYPos, 0));
+    auto floorTop2 = floorButtom1 >> geom::Translate(vec3(0, 64 - (2 * slopeYPos), 0));
+    ;
     auto floorSlope2 = geom::Plane().size({ 32, 32 }) >> geom::Rotate(glm::radians(-slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(slopeXPos + slopeXPosCompensation, slopeYPos + 64, 0));
     auto floorBottom2 = floorTop1 >> geom::Translate(vec3(0, 64 + (2 * slopeYPos), 0));
 
@@ -56,22 +57,22 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     auto m2 = geom::Cube().size({ 32, 1, 6 }) >> geom::Rotate(glm::radians(slopeTheta), vec3(0, 0, 1)) >> geom::Translate(vec3(0, 6, 0)) >> geom::Translate(vec3(((32 + slopeXPos + 0.6f) / 2) + 1.15f, slopeYPos - 0.65f - 0.23f, 0));
     */
     //auto m1 = geom::Cube().size({ 32, 5, 1 }) >> geom::Rotate(glm::radians(-slopeTheta / 2), vec3(0, 0, 1)) >> geom::Scale(vec3(sin(slopeTheta / 2), cos(slopeTheta / 2), 1)) >> geom::Rotate(glm::radians(-45.0f), vec3(0, 0, 1)) >> geom::Scale(vec3(sqrt(2) / sin(slopeTheta / 2), sqrt(2), 1));
-    mat4 shear = mat4(1.0, glm::radians(slopeTheta) - 0.0215, 0.0, 0.0,  // 1. column
-                  0.0, 1.0, 0.0, 0.0,  // 2. column
-                  0.0, 0.0, 1.0, 0.0,  // 3. column
-                  0.0, 0.0, 0.0, 1.0); // 4. column
+    mat4 shear = mat4(1.0, glm::radians(slopeTheta) - 0.0215, 0.0, 0.0, // 1. column
+        0.0, 1.0, 0.0, 0.0, // 2. column
+        0.0, 0.0, 1.0, 0.0, // 3. column
+        0.0, 0.0, 0.0, 1.0); // 4. column
     auto m11 = geom::Cube().size({ slopeXPos, 5, 1 }) >> geom::Translate(vec3(0, 0, -2.5)) >> geom::Transform(shear) >> geom::Translate(vec3(((32 + slopeXPos) / 2), slopeYPos + 2.50f, 0));
     auto m12 = geom::Cube().size({ slopeXPos, 1, 6 }) >> geom::Translate(vec3(0, 3, 0)) >> geom::Transform(shear) >> geom::Translate(vec3((32 + slopeXPos) / 2, slopeYPos + 2.50f, 0));
     auto m13 = m11 >> geom::Translate(vec3(0, 0, 5));
     mTunnelBatches1.push_back(gl::Batch::create(m11, mTexGlsl));
     mTunnelBatches1.push_back(gl::Batch::create(m12, mTexGlsl));
     mTunnelBatches1.push_back(gl::Batch::create(m13, mTexGlsl));
-    
+
     // setup TunnelLong
-    shear = mat4(1.0, -(glm::radians(slopeTheta) - 0.0215), 0.0, 0.0,  // 1. column
-                  0.0, 1.0, 0.0, 0.0,  // 2. column
-                  0.0, 0.0, 1.0, 0.0,  // 3. column
-                  0.0, 0.0, 0.0, 1.0); // 4. column
+    shear = mat4(1.0, -(glm::radians(slopeTheta) - 0.0215), 0.0, 0.0, // 1. column
+        0.0, 1.0, 0.0, 0.0, // 2. column
+        0.0, 0.0, 1.0, 0.0, // 3. column
+        0.0, 0.0, 0.0, 1.0); // 4. column
     auto m21 = geom::Cube().size({ slopeXPos, 5, 1 }) >> geom::Translate(vec3(0, 0, -2.5)) >> geom::Transform(shear) >> geom::Translate(vec3(((32 + slopeXPos) / 2), slopeYPos + 2.50f + 64, 0));
     auto m22 = geom::Cube().size({ slopeXPos, 1, 6 }) >> geom::Translate(vec3(0, 3, 0)) >> geom::Transform(shear) >> geom::Translate(vec3((32 + slopeXPos) / 2, slopeYPos + 2.50f + 64, 0));
     auto m23 = m21 >> geom::Translate(vec3(0, 0, 5));
@@ -172,14 +173,14 @@ void SceneTunnelVertical::draw()
 
     gl::enableStencilTest();
 
-    for (auto& portal : mPortals) {
+    for (int i = 0; i < mPortals.size(); ++i) {
         gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         gl::depthMask(GL_FALSE);
         gl::stencilFunc(GL_NEVER, 0, 0xFF);
         gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
         gl::clear(GL_STENCIL_BUFFER_BIT);
-        
-        portal->draw();
+
+        mPortals[i]->draw();
 
         gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         gl::depthMask(GL_TRUE);
@@ -187,17 +188,24 @@ void SceneTunnelVertical::draw()
         gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
         gl::pushViewMatrix();
 
-        mat4 newView = Portal::getNewViewMatrix(gl::getViewMatrix(), portal->getModelMatrix(), portal->getLinkedPortal()->getModelMatrix());
+        mat4 newView = Portal::getNewViewMatrix(gl::getViewMatrix(), mPortals[i]->getModelMatrix(), mPortals[i]->getLinkedPortal()->getModelMatrix());
         gl::setViewMatrix(newView);
         //
-        mTunnelTex->bind();
-        for (auto batch : mTunnelBatches1)
-            batch->draw();
+        if (i % 2 == 0) {
+            mTunnelTex->bind();
+            for (auto batch : mTunnelBatches1)
+                batch->draw();
 
-        mFloorTex->bind();
-        mFloorBatch11->draw();
-        mFloorBatch21->draw();
-        mFloorBatch31->draw();
+            mFloorTex->bind();
+            mFloorBatch11->draw();
+            mFloorBatch21->draw();
+            mFloorBatch31->draw();
+        } else {
+            mFloorTex->bind();
+            mFloorBatch11->draw();
+            mFloorBatch21->draw();
+            mFloorBatch31->draw();
+        }
         //
         gl::popViewMatrix();
     }
