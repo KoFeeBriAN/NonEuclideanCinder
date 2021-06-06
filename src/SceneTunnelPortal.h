@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Portal.h"
 #include "Scene.h"
 #include "Tunnel.h"
 #include <vector>
@@ -20,6 +21,9 @@ private:
     gl::BatchRef mFloorBatch;
     gl::BatchRef mImgFloorBatch;
     gl::BatchRef mSkyboxBatch;
+
+    // Portals
+    std::vector<Portal> mPortals;
 
     //Tunnel
     Tunnel mShortTunnel;
@@ -43,6 +47,8 @@ public:
     Camera* getCamera() override;
     void handleMouseMove(MouseEvent event) override;
     void handleKeyDown(KeyEvent event) override;
+
+    void drawSceneObjects();
 
 private:
     void processInput();

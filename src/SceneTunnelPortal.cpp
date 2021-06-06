@@ -56,6 +56,17 @@ void SceneTunnelPortal::setup(const std::unordered_map<std::string, DataSourceRe
     mImgLongTunnel.setTexture(mTunnelTex);
     mImgLongTunnel.setupTunnel();
 
+    // setup portal
+    mPortals.emplace_back(mCam, vec3(-10, 3, -5), Portal::Z);
+    mPortals.emplace_back(mCam, vec3(-10, -27, -5), Portal::Z);
+    mPortals[0].setSize(vec2(6, 4.5));
+    mPortals[1].setSize(vec2(4.5, 6));
+    mPortals[0].setLinkedPortal(mPortals[1]);
+    mPortals[1].setLinkedPortal(mPortals[0]);
+    for (auto& portal : mPortals) {
+        // portal.setPlayerCamera(mCam);
+        portal.setup();
+    }
     ImGui::Initialize();
 
     // initialize camera properties
@@ -99,6 +110,41 @@ void SceneTunnelPortal::draw()
     gl::enableDepthRead();
     gl::setMatrices(mCam);
 
+    gl::enableStencilTest();
+    for (auto& portal : mPortals) {
+        gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        gl::depthMask(GL_FALSE);
+        gl::stencilFunc(GL_NEVER, 0, 0xFF);
+        gl::stencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        gl::clear(GL_STENCIL_BUFFER_BIT);
+
+        portal.draw();
+
+        gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        gl::depthMask(GL_TRUE);
+        gl::stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        gl::stencilFunc(GL_LEQUAL, 1, 0xFF);
+        gl::pushViewMatrix();
+
+        mat4 newView = Portal::getNewViewMatrix(mCam.getViewMatrix(), portal.getModelMatrix(), portal.getLinkedPortal()->getModelMatrix());
+        gl::setViewMatrix(newView);
+        drawSceneObjects();
+        gl::popViewMatrix();
+    }
+    gl::disableStencilTest();
+
+    gl::clear(GL_DEPTH_BUFFER_BIT);
+    gl::colorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    gl::setMatrices(mCam);
+    for (auto& portal : mPortals)
+        portal.draw();
+    gl::colorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    drawSceneObjects();
+}
+
+void SceneTunnelPortal::drawSceneObjects()
+{
     // draw skybox
     mSkyboxTex->bind();
     mSkyboxBatch->draw();
@@ -118,7 +164,8 @@ void SceneTunnelPortal::draw()
     mImgLongTunnel.draw();
 }
 
-Camera* SceneTunnelPortal::getCamera()
+Camera*
+SceneTunnelPortal::getCamera()
 {
     return &mCam;
 }
