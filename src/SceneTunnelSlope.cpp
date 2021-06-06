@@ -80,15 +80,15 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     mTunnelBatches2.push_back(gl::Batch::create(m23, mTexGlsl));
 
     // Initialize portals
-    mPortals.push_back(new Portal(mCam));
-    mPortals.push_back(new Portal(mCam));
-    mPortals[0]->setOrigin(vec3(15.998, 3, 0));
-    mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
+    mPortals.push_back(new Portal(mCam, vec3(16, 2.5, 0), Portal::NORMAL_DIR::NEG_X));
+    mPortals.push_back(new Portal(mCam, vec3((slopeXPos + slopeXPosCompensation) * 2 - 16, 2 * slopeYPos + 2.5, 0), Portal::NORMAL_DIR::NEG_X));
+    //mPortals[0]->setOrigin(vec3(16, 2.5, 0));
+    //mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
 
-    mPortals[1]->setOrigin(vec3(15.998, slopeYPos + 64 - 3.1225, 0));
-    mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::X);
-    mPortals[0]->setSize(vec2(6, 6));
-    mPortals[1]->setSize(vec2(6, 6));
+    //mPortals[1]->setOrigin(vec3((slopeXPos + slopeXPosCompensation) * 2 - 16, 2 * slopeYPos + 2.5, 0));
+    //mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
+    mPortals[0]->setSize(vec2(5, 4));
+    mPortals[1]->setSize(vec2(5, 4));
     /*
     auto portal11 = new Portal(mCam, vec3(15.998, 3, 0), Portal::NORMAL_DIR::NEG_X);
     auto portal12 = new Portal(mCam, vec3(15.998, slopeYPos + 64 - 3.1225, 0), Portal::NORMAL_DIR::X);
@@ -193,16 +193,11 @@ void SceneTunnelVertical::draw()
         mTunnelTex->bind();
         for (auto batch : mTunnelBatches1)
             batch->draw();
-        for (auto batch : mTunnelBatches2)
-            batch->draw();
 
         mFloorTex->bind();
         mFloorBatch11->draw();
-        mFloorBatch12->draw();
         mFloorBatch21->draw();
-        mFloorBatch22->draw();
         mFloorBatch31->draw();
-        mFloorBatch32->draw();
         //
         gl::popViewMatrix();
     }
@@ -219,16 +214,11 @@ void SceneTunnelVertical::draw()
     mTunnelTex->bind();
     for (auto batch : mTunnelBatches1)
         batch->draw();
-    for (auto batch : mTunnelBatches2)
-            batch->draw();
 
     mFloorTex->bind();
     mFloorBatch11->draw();
-    mFloorBatch12->draw();
     mFloorBatch21->draw();
-    mFloorBatch22->draw();
     mFloorBatch31->draw();
-    mFloorBatch32->draw();
 }
 
 Camera* SceneTunnelVertical::getCamera()
