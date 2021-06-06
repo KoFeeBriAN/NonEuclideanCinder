@@ -110,6 +110,8 @@ void MainApp::setup()
     mSources.insert({ "skybox.vert", loadAsset("skybox.vert") });
     mSources.insert({ "skybox.frag", loadAsset("skybox.frag") });
     mSources.insert({ "wood-toon", loadAsset("wood-toon.jpg") });
+    mSources.insert({ "gold-1", loadAsset("gold-thai.jpg") });
+    mSources.insert({ "gold-2", loadAsset("golden-flower.jpg") });
 
     // Set Window size
     setWindowSize(mWindowWidth, mWindowHeight);

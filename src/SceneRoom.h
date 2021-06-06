@@ -28,6 +28,8 @@ private:
     // objects
     gl::BatchRef mObject;
     gl::BatchRef mObject2;
+    gl::BatchRef mObject3;
+    gl::BatchRef mObject4;
 
     ivec2 lastPos;
     ivec2 currentPos;

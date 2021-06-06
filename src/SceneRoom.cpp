@@ -29,7 +29,6 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     ImGui::Initialize();
 
     // Initialize camera properties
-
     mCam.setEyePoint({ 0, 5, -5 }); // set camera position
     mCam.setMoveSpeed(25.0);
     mLastCamPos = mCam.getEyePoint();
@@ -49,6 +48,8 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
 
     mRooms[1]->setFloorTexture(gl::Texture::create(loadImage(assets.at("wood-toon"))));
     mRooms[1]->setWallTexture(gl::Texture::create(loadImage(assets.at("rock-tunnel"))));
+    mRooms[2]->setFloorTexture(gl::Texture::create(loadImage(assets.at("gold-2"))));
+    mRooms[2]->setWallTexture(gl::Texture::create(loadImage(assets.at("gold-1"))));
 
     // Initialize portals
     mPortals.push_back(new Portal(mCam));
@@ -70,13 +71,18 @@ void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& asse
     for (auto& portal : mPortals)
         portal->setup();
 
-    auto teapot = geom::Teapot() >> geom::Translate(vec3(5, 5, 5));
-    auto glsl = gl::getStockShader(gl::ShaderDef().color());
+    auto glsl = gl::getStockShader(gl::ShaderDef().color().lambert());
+    auto teapot = geom::Teapot() >> geom::Scale(5.0f, 5.0f, 5.0f) >> geom::Translate(vec3(0, 3, 0));
     mObject = gl::Batch::create(teapot, glsl);
 
-    auto sphere = geom::Sphere() >> geom::Translate(vec3(13, 34, 8));
-    auto glsl2 = gl::getStockShader(gl::ShaderDef().color());
-    mObject2 = gl::Batch::create(sphere, glsl2);
+    auto sphere = geom::Sphere().radius(5.0f).subdivisions(50) >> geom::Translate(vec3(50, 30, 50));
+    mObject2 = gl::Batch::create(sphere, glsl);
+
+    auto cylinder = geom::Cylinder() >> geom::Scale(5.0f, 5.0f, 5.0f) >> geom::Translate(vec3(100, 3, 0));
+    mObject3 = gl::Batch::create(cylinder, glsl);
+
+    auto cone = geom::Cone() >> geom::Scale(5.0f, 5.0f, 5.0f) >> geom::Translate(vec3(0, 3, 100));
+    mObject4 = gl::Batch::create(cone, glsl);
 }
 
 void SceneRoom::update(double currentTime)
@@ -142,8 +148,12 @@ void SceneRoom::draw()
         gl::setViewMatrix(newView);
         for (auto room : mRooms)
             room->draw();
+
+        // draw illusion in the portals
         mObject->draw();
         mObject2->draw();
+        mObject3->draw();
+        mObject4->draw();
         gl::popViewMatrix();
     }
 
@@ -161,6 +171,8 @@ void SceneRoom::draw()
 
     mObject->draw();
     mObject2->draw();
+    mObject3->draw();
+    mObject4->draw();
 }
 
 Camera* SceneRoom::getCamera()
