@@ -83,6 +83,8 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     // Initialize portals
     mPortals.push_back(new Portal(mCam, vec3(16, 2.5, 0), Portal::NORMAL_DIR::NEG_X));
     mPortals.push_back(new Portal(mCam, vec3((slopeXPos + slopeXPosCompensation) * 2 - 16, 2 * slopeYPos + 2.5, 0), Portal::NORMAL_DIR::NEG_X));
+    mPortals.push_back(new Portal(mCam, vec3((slopeXPos + slopeXPosCompensation) * 2 - 16, 2 * slopeYPos + 2.5, 0), Portal::NORMAL_DIR::X));
+    mPortals.push_back(new Portal(mCam, vec3(16, 2.5, 0), Portal::NORMAL_DIR::X));
     //mPortals[0]->setOrigin(vec3(16, 2.5, 0));
     //mPortals[0]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
 
@@ -90,6 +92,8 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     //mPortals[1]->setNormalDirection(Portal::NORMAL_DIR::NEG_X);
     mPortals[0]->setSize(vec2(5, 4));
     mPortals[1]->setSize(vec2(5, 4));
+    mPortals[2]->setSize(vec2(5, 4));
+    mPortals[3]->setSize(vec2(5, 4));
     /*
     auto portal11 = new Portal(mCam, vec3(15.998, 3, 0), Portal::NORMAL_DIR::NEG_X);
     auto portal12 = new Portal(mCam, vec3(15.998, slopeYPos + 64 - 3.1225, 0), Portal::NORMAL_DIR::X);
@@ -103,6 +107,8 @@ void SceneTunnelVertical::setup(const std::unordered_map<std::string, DataSource
     // Linked Portals
     mPortals[0]->setLinkedPortal(*mPortals[1]);
     mPortals[1]->setLinkedPortal(*mPortals[0]);
+    mPortals[2]->setLinkedPortal(*mPortals[3]);
+    mPortals[3]->setLinkedPortal(*mPortals[2]);
 
     for (auto& portal : mPortals)
         portal->setPlayerCamera(mCam);
@@ -201,10 +207,15 @@ void SceneTunnelVertical::draw()
             mFloorBatch21->draw();
             mFloorBatch31->draw();
         } else {
-            mFloorTex->bind();
-            mFloorBatch11->draw();
-            mFloorBatch21->draw();
-            mFloorBatch31->draw();
+            if (i == 3) {
+                mFloorTex->bind();
+                mFloorBatch31->draw();
+            } else {
+                mFloorTex->bind();
+                mFloorBatch11->draw();
+                mFloorBatch21->draw();
+                mFloorBatch31->draw();
+            }
         }
         //
         gl::popViewMatrix();
