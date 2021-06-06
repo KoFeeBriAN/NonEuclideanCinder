@@ -1,6 +1,7 @@
 {
 	"C_Cpp.clang_format_fallbackStyle": "WebKit",
 	"C_Cpp.default.cppStandard": "gnu++17",
+	"editor.formatOnSave": true,
 	"files.associations": {
 		"*.ipp": "cpp",
 		"*.tcc": "cpp",

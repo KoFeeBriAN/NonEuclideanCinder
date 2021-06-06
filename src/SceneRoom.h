@@ -39,7 +39,7 @@ private:
     bool firstMouseMove = true;
 
 public:
-    ~SceneRoom() = default;
+    ~SceneRoom();
     void setup(const std::unordered_map<std::string, DataSourceRef>& assets) override;
     void update(double currentTime) override;
     void draw() override;

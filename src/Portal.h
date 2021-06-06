@@ -37,7 +37,6 @@ public:
     bool isIntersect(const vec3& la, const vec3& lb);
     void warp(CameraFP& camera);
 
-    CameraFP* getPortalCamera();
     mat4 getModelMatrix() const;
     Portal* getLinkedPortal();
 
@@ -52,7 +51,6 @@ protected:
 
     vec3 mCameraViewDirection;
 
-    CameraFP* mPortalCamera;
     Portal* mLinkedPortal;
     const CameraFP* mPlayerCamera;
 

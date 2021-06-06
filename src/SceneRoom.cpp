@@ -10,6 +10,12 @@
 
 using namespace ci;
 
+SceneRoom::~SceneRoom()
+{
+    for (auto room : mRooms) delete room;
+    for (auto portal : mPortals) delete portal;
+}
+
 void SceneRoom::setup(const std::unordered_map<std::string, DataSourceRef>& assets)
 {
     gl::enableDepthWrite();
