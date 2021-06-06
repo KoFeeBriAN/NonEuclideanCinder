@@ -143,7 +143,7 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 {
     if (la == lb)
         return 0;
-    if (glm::dot(lb - la, mNormal) > 0.0)
+    if (glm::dot((lb - la), mNormal) > 0)
         return 0;
     vec4 p[4] = { vec4(mOrigin + mSize.x / 2 * mUp - mSize.y / 2 * mRight, 1.0),
         vec4(mOrigin + mSize.x / 2 * mUp + mSize.y / 2 * mRight, 1.0),
@@ -167,13 +167,16 @@ bool Portal::isIntersect(const vec3& la, const vec3& lb)
 
 void Portal::warp(CameraFP& camera)
 {
-    float offset = .6f;
+    float offset = 1.0f;
     vec3 destPos = mLinkedPortal->mOrigin;
     vec3 destNorm = mLinkedPortal->mNormal;
 
     // Update Camera View
     float angle = glm::acos(glm::dot(mNormal, destNorm));
     float sign = glm::cross(mNormal, destNorm).y;
+
+    CI_LOG_D(angle);
+    CI_LOG_D(sign);
 
     vec3 v = mOrigin - camera.getEyePoint();
     if (sign)
@@ -196,7 +199,7 @@ void Portal::warp(CameraFP& camera)
     // CI_LOG_D("curPos Now");
     // CI_LOG_D(camera.getEyePoint());
 
-    vec3 newDir = glm::rotate(camera.getViewDirection(), sign < 0 ? angle : -angle, vec3(0, 1, 0));
+    vec3 newDir = glm::rotate(camera.getViewDirection(), sign <= 0 ? glm::pi<float>() - angle : -angle, vec3(0, 1, 0));
     camera.lookAt(camera.getEyePoint() + newDir);
 
     updateModelMatrix();
